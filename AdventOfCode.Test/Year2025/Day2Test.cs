@@ -5,7 +5,7 @@ namespace AdventOfCode.Test.Year2025
     public class Day2Test
     {
         [Test]
-        public void SumOfBasicRepeatedSequenceProductsInRanges_WithMultipleRangesFromString_ShouldReturnCorrectSum()
+        public void SumOfAnyRepeatedSequenceProductsInRanges_WithMultipleRangesFromString_ShouldReturnCorrectSum()
         {
             // Arrange
             var productRanges = "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124";
@@ -14,7 +14,190 @@ namespace AdventOfCode.Test.Year2025
                 .Select(Day2.ParseProductRange);
 
             // Act
-            var result = Day2.SumOfBasicRepeatedSequenceProductsInRanges(ranges);
+            var result = Day2.SumOfRepeatedSequenceProductsInRanges(ranges, SequenceType.AnyRepeated);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.EqualTo((11UL + 22UL) + (99UL + 111UL) + (999UL + 1010UL) + (1188511885UL) + (222222UL) + (0) + (446446UL) + (38593859UL) + (565656UL) + (824824824UL) + (2121212121)));
+                Assert.That(result, Is.EqualTo(4174379265UL));
+            });
+        }
+
+        [Test]
+        public void SumOfAnyRepeatedSequenceProductsInRanges_WhenRangeIsVeryLarge_ShouldReturnCorrectSum()
+        {
+            // Arrange
+            var ranges = new List<ProductRange>
+            {
+                new(1188511880UL, 1188511890UL)
+            };
+
+            // Act
+            var result = Day2.SumOfRepeatedSequenceProductsInRanges(ranges, SequenceType.AnyRepeated);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(1188511885));
+        }
+
+        [Test]
+        public void SumOfAnyRepeatedSequenceProductsInRanges_WhenRangeHasNoRepeatedSequenceProducts_ShouldReturnZero()
+        {
+            // Arrange
+            var ranges = new List<ProductRange>
+            {
+                new(123UL, 130UL)
+            };
+
+            // Act
+            var result = Day2.SumOfRepeatedSequenceProductsInRanges(ranges, SequenceType.AnyRepeated);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(0UL));
+        }
+
+        [Test]
+        public void SumOfAnyRepeatedSequenceProductsInRanges_WhenSingleRangeProvided_ShouldReturnCorrectSum()
+        {
+            // Arrange
+            var ranges = new List<ProductRange>
+            {
+                new(10UL, 30UL)
+            };
+            // Act
+            var result = Day2.SumOfRepeatedSequenceProductsInRanges(ranges, SequenceType.AnyRepeated);
+            // Assert
+            Assert.That(result, Is.EqualTo(11UL + 22UL));
+        }
+
+        [Test]
+        public void SumOfAnyRepeatedSequenceProductsInRanges_WhenNoRangesProvided_ShouldReturnZero()
+        {
+            // Arrange
+            var ranges = new List<ProductRange>();
+
+            // Act
+            var result = Day2.SumOfRepeatedSequenceProductsInRanges(ranges, SequenceType.AnyRepeated);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(0UL));
+        }
+
+        [Test]
+        public void SumOfAnyRepeatedSequenceProductsInRanges_WhenRangesIsNull_ShouldThrowArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => Day2.SumOfRepeatedSequenceProductsInRanges(null!, SequenceType.AnyRepeated));
+        }
+
+        [Test]
+        public void SumOfAnyRepeatedSequenceProductsInRanges_WhenMultipleRangesProvided_ShouldReturnCorrectSum()
+        {
+            // Arrange
+            var ranges = new List<ProductRange>
+            {
+                new(10UL, 30UL),
+                new(50UL, 70UL)
+            };
+
+            // Act
+            var result = Day2.SumOfRepeatedSequenceProductsInRanges(ranges, SequenceType.AnyRepeated);
+
+            // Assert
+            Assert.That(result, Is.EqualTo((11UL + 22UL) + (55UL + 66UL)));
+        }
+
+        [Test]
+        public void SumOfAnyRepeatedSequenceProductsInRange_WhenRangeIsNull_ShouldThrowArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => Day2.SumOfRepeatedSequenceProductsInRange(null!, SequenceType.AnyRepeated));
+        }
+
+        [Test]
+        public void SumOfAnyRepeatedSequenceProductsInRange__WhenRangeStartIsGreaterThanEnd_ShouldThrowArgumentException()
+        {
+            // Arrange
+            var range = new ProductRange(30UL, 10UL);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => Day2.SumOfRepeatedSequenceProductsInRange(range, SequenceType.AnyRepeated));
+        }
+
+        [Test]
+        public void SumOfAnyRepeatedSequenceProductsInRange_WhenRangeHasRepeatedSequenceProducts_ShouldReturnCorrectSum()
+        {
+            // Arrange
+            var range = new ProductRange(10UL, 30UL);
+
+            // Act
+            var result = Day2.SumOfRepeatedSequenceProductsInRange(range, SequenceType.AnyRepeated);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(11UL + 22UL));
+        }
+
+        [Test]
+        public void SumOfAnyRepeatedSequenceProductsInRange_WhenRangeHasNoRepeatedSequenceProducts_ShouldReturnZero()
+        {
+            // Arrange
+            var range = new ProductRange(123UL, 130UL);
+            // Act
+            var result = Day2.SumOfRepeatedSequenceProductsInRange(range, SequenceType.AnyRepeated);
+            // Assert
+            Assert.That(result, Is.EqualTo(0UL));
+        }
+
+        [Test]
+        public void SumOfAnyRepeatedSequenceProductsInRange_WhenRangeIsSingleNumberWithRepeatedSequence_ShouldReturnThatNumber()
+        {
+            // Arrange
+            var range = new ProductRange(99UL, 99UL);
+
+            // Act
+            var result = Day2.SumOfRepeatedSequenceProductsInRange(range, SequenceType.AnyRepeated);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(99UL));
+        }
+
+        [TestCase(1234567890UL)]
+        [TestCase(1188511880UL)]
+        [TestCase(222220UL)]
+        [TestCase(2121212118UL)]
+        public void HasRepeatedSequence_WhenInputIsInvalid_ShouldReturnFalse(ulong number)
+        {
+            // Act
+            var result = Day2.HasRepeatedSequence(number);
+
+            // Assert
+            Assert.That(result, Is.False);
+        }
+
+        [TestCase(12341234UL)]
+        [TestCase(123123123UL)]
+        [TestCase(1212121212UL)]
+        [TestCase(1111111UL)]
+        public void HasRepeatedSequence_WhenInputIsValid_ShouldReturnTrue(ulong number)
+        {
+            // Act
+            var result = Day2.HasRepeatedSequence(number);
+
+            // Assert
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void SumOfTwiceRepeatedSequenceProductsInRanges_WithMultipleRangesFromString_ShouldReturnCorrectSum()
+        {
+            // Arrange
+            var productRanges = "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124";
+
+            var ranges = Day2.CommaDelimitedList(productRanges)
+                .Select(Day2.ParseProductRange);
+
+            // Act
+            var result = Day2.SumOfRepeatedSequenceProductsInRanges(ranges, SequenceType.TwiceRepeated);
 
             // Assert
             Assert.Multiple(() =>
@@ -25,7 +208,7 @@ namespace AdventOfCode.Test.Year2025
         }
 
         [Test]
-        public void SumOfBasicRepeatedSequenceProductsInRanges_WhenRangeIsVeryLarge_ShouldReturnCorrectSum()
+        public void SumOfTwiceRepeatedSequenceProductsInRanges_WhenRangeIsVeryLarge_ShouldReturnCorrectSum()
         {
             // Arrange
             var ranges = new List<ProductRange>
@@ -34,14 +217,14 @@ namespace AdventOfCode.Test.Year2025
             };
 
             // Act
-            var result = Day2.SumOfBasicRepeatedSequenceProductsInRanges(ranges);
+            var result = Day2.SumOfRepeatedSequenceProductsInRanges(ranges, SequenceType.TwiceRepeated);
 
             // Assert
             Assert.That(result, Is.EqualTo(1188511885));
         }
 
         [Test]
-        public void SumOfBasicRepeatedSequenceProductsInRanges_WhenRangeHasNoRepeatedSequenceProducts_ShouldReturnZero()
+        public void SumOfTwiceRepeatedSequenceProductsInRanges_WhenRangeHasNoRepeatedSequenceProducts_ShouldReturnZero()
         {
             // Arrange
             var ranges = new List<ProductRange>
@@ -50,14 +233,14 @@ namespace AdventOfCode.Test.Year2025
             };
 
             // Act
-            var result = Day2.SumOfBasicRepeatedSequenceProductsInRanges(ranges);
+            var result = Day2.SumOfRepeatedSequenceProductsInRanges(ranges, SequenceType.TwiceRepeated);
 
             // Assert
             Assert.That(result, Is.EqualTo(0UL));
         }
 
         [Test]
-        public void SumOfBasicRepeatedSequenceProductsInRanges_WhenSingleRangeProvided_ShouldReturnCorrectSum()
+        public void SumOfTwiceRepeatedSequenceProductsInRanges_WhenSingleRangeProvided_ShouldReturnCorrectSum()
         {
             // Arrange
             var ranges = new List<ProductRange>
@@ -65,33 +248,33 @@ namespace AdventOfCode.Test.Year2025
                 new(10UL, 30UL)
             };
             // Act
-            var result = Day2.SumOfBasicRepeatedSequenceProductsInRanges(ranges);
+            var result = Day2.SumOfRepeatedSequenceProductsInRanges(ranges, SequenceType.TwiceRepeated);
             // Assert
             Assert.That(result, Is.EqualTo(11UL + 22UL));
         }
 
         [Test]
-        public void SumOfBasicRepeatedSequenceProductsInRanges_WhenNoRangesProvided_ShouldReturnZero()
+        public void SumOfTwiceRepeatedSequenceProductsInRanges_WhenNoRangesProvided_ShouldReturnZero()
         {
             // Arrange
             var ranges = new List<ProductRange>();
 
             // Act
-            var result = Day2.SumOfBasicRepeatedSequenceProductsInRanges(ranges);
+            var result = Day2.SumOfRepeatedSequenceProductsInRanges(ranges, SequenceType.TwiceRepeated);
 
             // Assert
             Assert.That(result, Is.EqualTo(0UL));
         }
 
         [Test]
-        public void SumOfBasicRepeatedSequenceProductsInRanges_WhenRangesIsNull_ShouldThrowArgumentNullException()
+        public void SumOfTwiceRepeatedSequenceProductsInRanges_WhenRangesIsNull_ShouldThrowArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => Day2.SumOfBasicRepeatedSequenceProductsInRanges(null!));
+            Assert.Throws<ArgumentNullException>(() => Day2.SumOfRepeatedSequenceProductsInRanges(null!, SequenceType.TwiceRepeated));
         }
 
         [Test]
-        public void SumOfBasicRepeatedSequenceProductsInRanges_WhenMultipleRangesProvided_ShouldReturnCorrectSum()
+        public void SumOfTwiceRepeatedSequenceProductsInRanges_WhenMultipleRangesProvided_ShouldReturnCorrectSum()
         {
             // Arrange
             var ranges = new List<ProductRange>
@@ -101,61 +284,61 @@ namespace AdventOfCode.Test.Year2025
             };
 
             // Act
-            var result = Day2.SumOfBasicRepeatedSequenceProductsInRanges(ranges);
+            var result = Day2.SumOfRepeatedSequenceProductsInRanges(ranges, SequenceType.TwiceRepeated);
 
             // Assert
             Assert.That(result, Is.EqualTo((11UL + 22UL) + (55UL + 66UL)));
         }
 
         [Test]
-        public void SumOfBasicRepeatedSequenceProductsInRange_WhenRangeIsNull_ShouldThrowArgumentNullException()
+        public void SumOfTwiceRepeatedSequenceProductsInRange_WhenRangeIsNull_ShouldThrowArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => Day2.SumOfBasicRepeatedSequenceProductsInRange(null!));
+            Assert.Throws<ArgumentNullException>(() => Day2.SumOfRepeatedSequenceProductsInRange(null!, SequenceType.TwiceRepeated));
         }
 
         [Test]
-        public void SumOfBasicRepeatedSequenceProductsInRange__WhenRangeStartIsGreaterThanEnd_ShouldThrowArgumentException()
+        public void SumOfTwiceRepeatedSequenceProductsInRange__WhenRangeStartIsGreaterThanEnd_ShouldThrowArgumentException()
         {
             // Arrange
             var range = new ProductRange(30UL, 10UL);
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => Day2.SumOfBasicRepeatedSequenceProductsInRange(range));
+            Assert.Throws<ArgumentException>(() => Day2.SumOfRepeatedSequenceProductsInRange(range, SequenceType.TwiceRepeated));
         }
 
         [Test]
-        public void SumOfBasicRepeatedSequenceProductsInRange_WhenRangeHasBasicRepeatedSequenceProducts_ShouldReturnCorrectSum()
+        public void SumOfTwiceRepeatedSequenceProductsInRange_WhenRangeHasRepeatedSequenceProducts_ShouldReturnCorrectSum()
         {
             // Arrange
             var range = new ProductRange(10UL, 30UL);
 
             // Act
-            var result = Day2.SumOfBasicRepeatedSequenceProductsInRange(range);
+            var result = Day2.SumOfRepeatedSequenceProductsInRange(range, SequenceType.TwiceRepeated);
 
             // Assert
             Assert.That(result, Is.EqualTo(11UL + 22UL));
         }
 
         [Test]
-        public void SumOfBasicRepeatedSequenceProductsInRange_WhenRangeHasNoRepeatedSequenceProducts_ShouldReturnZero()
+        public void SumOfTwiceRepeatedSequenceProductsInRange_WhenRangeHasNoRepeatedSequenceProducts_ShouldReturnZero()
         {
             // Arrange
             var range = new ProductRange(123UL, 130UL);
             // Act
-            var result = Day2.SumOfBasicRepeatedSequenceProductsInRange(range);
+            var result = Day2.SumOfRepeatedSequenceProductsInRange(range, SequenceType.TwiceRepeated);
             // Assert
             Assert.That(result, Is.EqualTo(0UL));
         }
 
         [Test]
-        public void SumOfBasicRepeatedSequenceProductsInRange_WhenRangeIsSingleNumberWithRepeatedSequence_ShouldReturnThatNumber()
+        public void SumOfTwiceRepeatedSequenceProductsInRange_WhenRangeIsSingleNumberWithRepeatedSequence_ShouldReturnThatNumber()
         {
             // Arrange
             var range = new ProductRange(99UL, 99UL);
 
             // Act
-            var result = Day2.SumOfBasicRepeatedSequenceProductsInRange(range);
+            var result = Day2.SumOfRepeatedSequenceProductsInRange(range, SequenceType.TwiceRepeated);
 
             // Assert
             Assert.That(result, Is.EqualTo(99UL));

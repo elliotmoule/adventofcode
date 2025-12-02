@@ -5,9 +5,10 @@
         public void ExecutePart1()
         {
             var day2Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Day2_Input.txt"));
-            var result = SumOfBasicRepeatedSequenceProductsInRanges(
-                CommaDelimitedList(day2Input)
-                .Select(ParseProductRange)
+            var result = SumOfRepeatedSequenceProductsInRanges(
+                    CommaDelimitedList(day2Input)
+                    .Select(ParseProductRange),
+                SequenceType.TwiceRepeated
             );
 
             Console.WriteLine($"\r\nThe sum of all products with repeated sequences in the given ranges is {result}.\r\n");
@@ -15,10 +16,17 @@
 
         public void ExecutePart2()
         {
-            throw new NotImplementedException();
+            var day2Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Day2_Input.txt"));
+            var result = SumOfRepeatedSequenceProductsInRanges(
+                    CommaDelimitedList(day2Input)
+                    .Select(ParseProductRange),
+                SequenceType.AnyRepeated
+            );
+
+            Console.WriteLine($"\r\nThe sum of all products with any repeated sequences in the given ranges is {result}.\r\n");
         }
 
-        internal static ulong SumOfBasicRepeatedSequenceProductsInRanges(IEnumerable<ProductRange> ranges)
+        internal static ulong SumOfRepeatedSequenceProductsInRanges(IEnumerable<ProductRange> ranges, SequenceType type)
         {
             if (ranges == null)
             {
@@ -33,12 +41,12 @@
             ulong totalSum = 0;
             foreach (var range in ranges)
             {
-                totalSum += SumOfBasicRepeatedSequenceProductsInRange(range);
+                totalSum += SumOfRepeatedSequenceProductsInRange(range, type);
             }
             return totalSum;
         }
 
-        internal static ulong SumOfBasicRepeatedSequenceProductsInRange(ProductRange range)
+        internal static ulong SumOfRepeatedSequenceProductsInRange(ProductRange range, SequenceType type)
         {
             if (range == null)
             {
@@ -52,18 +60,55 @@
 
             if (range.Start == range.End)
             {
-                return HasBasicRepeatedSequence(range.Start) ? range.Start : 0;
+                var result = 0UL;
+
+                if (type == SequenceType.TwiceRepeated)
+                {
+                    result = HasBasicRepeatedSequence(range.Start) ? range.Start : 0;
+                }
+                else if (type == SequenceType.AnyRepeated)
+                {
+                    result = HasRepeatedSequence(range.Start) ? range.Start : 0;
+                }
+
+                return result;
             }
 
             ulong sum = 0;
             for (ulong number = range.Start; number <= range.End; number++)
             {
-                if (HasBasicRepeatedSequence(number))
+                if (type == SequenceType.AnyRepeated && HasRepeatedSequence(number))
+                {
+                    sum += number;
+                }
+                else if (type == SequenceType.TwiceRepeated && HasBasicRepeatedSequence(number))
                 {
                     sum += number;
                 }
             }
             return sum;
+        }
+
+        internal static bool HasRepeatedSequence(ulong number)
+        {
+            // 12341234, 123123123, 1212121212, 1111111, are all valid sequences.
+            var numberStr = number.ToString();
+            var length = numberStr.Length;
+            for (int seqLength = 1; seqLength <= length / 2; seqLength++)
+            {
+                if (length % seqLength != 0)
+                {
+                    continue; // Sequence length must divide evenly into the total length
+                }
+                var sequence = numberStr[..seqLength];
+                var repeatedSequence = string.Concat(Enumerable.Repeat(sequence, length / seqLength));
+                if (repeatedSequence == numberStr)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         internal static bool HasBasicRepeatedSequence(ulong number)
@@ -130,4 +175,10 @@
     }
 
     internal record ProductRange(ulong Start, ulong End);
+
+    internal enum SequenceType
+    {
+        TwiceRepeated,
+        AnyRepeated // Includes TwiceRepeated
+    }
 }
