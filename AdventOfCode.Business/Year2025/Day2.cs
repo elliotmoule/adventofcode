@@ -5,7 +5,7 @@
         public void ExecutePart1()
         {
             var day2Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Day2_Input.txt"));
-            var result = SumOfRepeatedSequenceProductsInRanges(
+            var result = SumOfBasicRepeatedSequenceProductsInRanges(
                 CommaDelimitedList(day2Input)
                 .Select(ParseProductRange)
             );
@@ -18,7 +18,7 @@
             throw new NotImplementedException();
         }
 
-        internal static ulong SumOfRepeatedSequenceProductsInRanges(IEnumerable<ProductRange> ranges)
+        internal static ulong SumOfBasicRepeatedSequenceProductsInRanges(IEnumerable<ProductRange> ranges)
         {
             if (ranges == null)
             {
@@ -33,12 +33,12 @@
             ulong totalSum = 0;
             foreach (var range in ranges)
             {
-                totalSum += SumOfRepeatedSequenceProductsInRange(range);
+                totalSum += SumOfBasicRepeatedSequenceProductsInRange(range);
             }
             return totalSum;
         }
 
-        internal static ulong SumOfRepeatedSequenceProductsInRange(ProductRange range)
+        internal static ulong SumOfBasicRepeatedSequenceProductsInRange(ProductRange range)
         {
             if (range == null)
             {
@@ -52,13 +52,13 @@
 
             if (range.Start == range.End)
             {
-                return HasRepeatedSequence(range.Start) ? range.Start : 0;
+                return HasBasicRepeatedSequence(range.Start) ? range.Start : 0;
             }
 
             ulong sum = 0;
             for (ulong number = range.Start; number <= range.End; number++)
             {
-                if (HasRepeatedSequence(number))
+                if (HasBasicRepeatedSequence(number))
                 {
                     sum += number;
                 }
@@ -66,7 +66,7 @@
             return sum;
         }
 
-        internal static bool HasRepeatedSequence(ulong number)
+        internal static bool HasBasicRepeatedSequence(ulong number)
         {
             if (number.ToString().Length == 1)
             {
