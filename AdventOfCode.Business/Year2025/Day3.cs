@@ -7,7 +7,7 @@
             var day3Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Day3_Input.txt"));
             var result = SumOfProducedJoltage(day3Input);
 
-            Console.WriteLine($"\r\nThe dial was at position 0 a total of {result} times.\r\n");
+            Console.WriteLine($"\r\nThe total output joltage is {result}.\r\n");
         }
 
         public void ExecutePart2()

@@ -1,4 +1,5 @@
 ﻿using AdventOfCode.Business;
+using System.Reflection;
 
 namespace AdventOfCode.Terminal
 {
@@ -11,14 +12,20 @@ namespace AdventOfCode.Terminal
             var availableYears = new Dictionary<string, List<string>>
             {
                 { "Exit", [] },
-                { "2025", [ "Day 1", "Day 2" ] },
+                { "2025", [] },
             };
+
+            var dayClasses = GetAdventDayClasses();
+            availableYears["2025"] = [.. dayClasses
+                .Select(c => c.Replace("Day", "Day "))
+                .OrderBy(c => c)];
 
             MainCore(availableYears);
         }
 
         static void MainCore(Dictionary<string, List<string>> availableYears)
         {
+            Console.ForegroundColor = ConsoleColor.White;
             while (true)
             {
                 Output.WriteMultiNewLine("---- Advent of Code ----");
@@ -154,6 +161,24 @@ namespace AdventOfCode.Terminal
             return type == null
                 ? throw new InvalidOperationException($"Type {typeName} not found in assembly {assembly.FullName}.")
                 : (IAdventDay)Activator.CreateInstance(type)!;
+        }
+
+        internal static IEnumerable<string> GetAdventDayClasses()
+        {
+            var targetNamespace = "AdventOfCode.Business.Year2025";
+            var interfaceType = typeof(IAdventDay);
+
+            // Load the referenced assembly by its simple name
+            var businessAssembly = Assembly.Load("AdventOfCode.Business");
+
+            return businessAssembly
+                .GetTypes()
+                .Where(t =>
+                    t.IsClass &&
+                    !t.IsAbstract &&
+                    t.Namespace == targetNamespace &&
+                    interfaceType.IsAssignableFrom(t))
+                .Select(type => type.Name);
         }
     }
 }

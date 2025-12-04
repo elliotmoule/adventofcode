@@ -417,4 +417,4 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
-/AdventOfCode.Business/Resources
+/AdventOfCode.Business/*/Resources
