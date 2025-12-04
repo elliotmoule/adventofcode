@@ -56,6 +56,11 @@
 
         internal static List<Battery> ExtractBatteries(string input)
         {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                throw new ArgumentException("Input cannot be null or empty.", nameof(input));
+            }
+
             var batteries = new List<Battery>();
             foreach (var rating in input)
             {
@@ -65,34 +70,43 @@
             return batteries;
         }
 
-        internal static (uint first, uint second) GetLargestNumbers(List<uint> numbers)
+        internal static (uint first, uint second) GetLargestTwoDigitNumber(List<uint> numbers)
         {
             if (numbers == null || numbers.Count < 2)
             {
-                throw new ArgumentException("The list must contain at least two numbers.");
+                throw new ArgumentException("List must contain at least two numbers");
             }
 
-            uint firstLargest = 0;
-            uint secondLargest = 0;
-            foreach (var number in numbers)
+            uint maxNumber = 0;
+            uint bestFirst = 0;
+            uint bestSecond = 0;
+            uint currentFirst = numbers[0];
+
+            // Go left to right, track the best first digit seen so far
+            for (int i = 1; i < numbers.Count; i++)
             {
-                if (number > firstLargest)
+                // Form a two-digit number with current best first digit and current number
+                uint candidate = currentFirst * 10 + numbers[i];
+                if (candidate > maxNumber)
                 {
-                    secondLargest = firstLargest;
-                    firstLargest = number;
+                    maxNumber = candidate;
+                    bestFirst = currentFirst;
+                    bestSecond = numbers[i];
                 }
-                else if (number > secondLargest && number != firstLargest)
+
+                // Update the best first digit if current number is better
+                if (numbers[i] > currentFirst)
                 {
-                    secondLargest = number;
+                    currentFirst = numbers[i];
                 }
             }
 
-            return (firstLargest, secondLargest);
+            return (bestFirst, bestSecond);
         }
 
         internal static uint CalculateProducedJoltage(List<Battery> batteries)
         {
-            var (first, second) = GetLargestNumbers([.. batteries.Select(b => b.JoltageRating)]);
+            var (first, second) = GetLargestTwoDigitNumber([.. batteries.Select(b => b.JoltageRating)]);
             var combinedString = first.ToString() + second.ToString();
             return uint.Parse(combinedString);
         }
