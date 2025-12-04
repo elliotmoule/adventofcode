@@ -17,7 +17,48 @@
 
         internal static uint SumOfProducedJoltage(string input)
         {
-            return 0;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                throw new ArgumentException("Input cannot be null or empty.", nameof(input));
+            }
+
+            var banks = ExtractBatteryBanks(input);
+            return (uint)banks.Sum(b => b.Joltage);
+        }
+
+        internal static List<BatteryBank> ExtractBatteryBanks(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                throw new ArgumentException("Input cannot be null or empty.", nameof(input));
+            }
+
+            var banks = new List<BatteryBank>();
+            var bankStrings = input.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+            foreach (var bankString in bankStrings)
+            {
+                banks.Add(new BatteryBank(bankString.Trim()));
+            }
+            return banks;
+        }
+    }
+
+    internal class BatteryBank
+    {
+        internal uint Joltage { get; private set; }
+        internal List<Battery> Batteries { get; private set; }
+
+        public BatteryBank(string bankString)
+        {
+        }
+    }
+
+    internal class Battery
+    {
+        internal uint JoltageRating { get; private set; }
+
+        public Battery()
+        {
         }
     }
 }
