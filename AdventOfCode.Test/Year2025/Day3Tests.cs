@@ -43,12 +43,13 @@
                 818181911112111
                 """;
 
-            // Act
-            var result = Business.Year2025.Day3.SumOfProducedJoltage(input);
-
-            // Assert
-            uint expected = 0;
-            Assert.That(result, Is.EqualTo(expected));
+            // Act & Assert
+            Assert.Multiple(() =>
+            {
+                var ex = Assert.Throws<ArgumentException>(() => Business.Year2025.Day3.SumOfProducedJoltage(input));
+                Assert.That(ex!.ParamName, Is.EqualTo("rating"));
+                Assert.That(ex!.Message, Does.Contain("Battery rating must be a digit character"));
+            });
         }
 
         [Test]
@@ -78,7 +79,7 @@
         }
 
         [Test]
-        public void ExtractBatteryBanks_WhenInvalidInputIsProvided_ShouldReturn0()
+        public void ExtractBatteryBanks_WhenInvalidInputIsProvided_ShouldThrowArgumentException()
         {
             // Arrange
             var input =
@@ -88,11 +89,8 @@
                 1111111111
                 """;
 
-            // Act
-            var banks = Business.Year2025.Day3.ExtractBatteryBanks(input);
-
-            // Assert
-            Assert.That(banks, Has.Count.EqualTo(0));
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => Business.Year2025.Day3.ExtractBatteryBanks(input));
         }
 
         [Test]
@@ -109,16 +107,13 @@
         }
 
         [Test]
-        public void ExtractBatteries_WhenInvalidBankStringIsProvided_ShouldReturn0()
+        public void ExtractBatteries_WhenInvalidBankStringIsProvided_ShouldThrowArgumentException()
         {
             // Arrange
             var bankString = "12A34B6789";
 
-            // Act
-            var batteries = Business.Year2025.BatteryBank.ExtractBatteries(bankString);
-
-            // Assert
-            Assert.That(batteries, Has.Count.EqualTo(0));
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => Business.Year2025.BatteryBank.ExtractBatteries(bankString));
         }
 
         [TestCase("")]
@@ -209,6 +204,37 @@
                     Assert.That(second, Is.EqualTo(expectedValues[index].second));
                 }
             });
+        }
+
+        [Test]
+        public void CalculateProducedJoltage_WhenBatteriesAreProvided_ShouldReturnCorrectJoltage()
+        {
+            // Arrange
+            var batteries = new List<Business.Year2025.Battery>
+            {
+                new('9'),
+                new('5'),
+                new('3'),
+                new('7'),
+            };
+
+            // Act
+            var joltage = Business.Year2025.BatteryBank.CalculateProducedJoltage(batteries);
+
+            // Assert
+            uint expectedJoltage = 97;
+            Assert.That(joltage, Is.EqualTo(expectedJoltage));
+        }
+
+        [Test]
+        public void CalculateProducedJoltage_WhenNoBatteriesAreProvided_ShouldThrowArgumentException()
+        {
+            // Arrange
+            var batteries = new List<Business.Year2025.Battery>();
+
+            // Act & Assert
+            var ex = Assert.Throws<ArgumentException>(() => Business.Year2025.BatteryBank.CalculateProducedJoltage(batteries));
+            Assert.That(ex.Message, Does.Contain("at least two numbers"));
         }
     }
 }

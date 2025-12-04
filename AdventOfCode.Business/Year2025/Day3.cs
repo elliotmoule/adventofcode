@@ -106,6 +106,11 @@
 
         internal static uint CalculateProducedJoltage(List<Battery> batteries)
         {
+            if (batteries == null || batteries.Count < 2)
+            {
+                throw new ArgumentException("List must contain at least two numbers");
+            }
+
             var (first, second) = GetLargestTwoDigitNumber([.. batteries.Select(b => b.JoltageRating)]);
             var combinedString = first.ToString() + second.ToString();
             return uint.Parse(combinedString);
@@ -114,10 +119,16 @@
 
     internal class Battery
     {
-        internal uint JoltageRating { get; private set; }
+        internal uint JoltageRating { get; }
 
-        public Battery(char rating)
+        internal Battery(char rating)
         {
+            if (!char.IsDigit(rating))
+            {
+                throw new ArgumentException("Battery rating must be a digit character.", nameof(rating));
+            }
+
+            JoltageRating = (uint)(rating - '0');
         }
     }
 }
