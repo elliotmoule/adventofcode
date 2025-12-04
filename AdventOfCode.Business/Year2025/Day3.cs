@@ -5,28 +5,38 @@
         public void ExecutePart1()
         {
             var day3Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Day3_Input.txt"));
-            var result = SumOfProducedJoltage(day3Input);
+            var result = SumOfProducedJoltage(day3Input, 2);
 
             Console.WriteLine($"\r\nThe total output joltage is {result}.\r\n");
         }
 
         public void ExecutePart2()
         {
-            throw new NotImplementedException();
+            var day3Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Day3_Input.txt"));
+            var result = SumOfProducedJoltage(day3Input, 12);
+
+            Console.WriteLine($"\r\nThe total output joltage is {result}.\r\n");
         }
 
-        internal static uint SumOfProducedJoltage(string input)
+        internal static ulong SumOfProducedJoltage(string input, uint digits)
         {
             if (string.IsNullOrWhiteSpace(input))
             {
                 throw new ArgumentException("Input cannot be null or empty.", nameof(input));
             }
 
-            var banks = ExtractBatteryBanks(input);
-            return (uint)banks.Sum(b => b.Joltage);
+            var banks = ExtractBatteryBanks(input, digits);
+
+            var sumJoltage = 0UL;
+            foreach (var bank in banks)
+            {
+                sumJoltage += bank.Joltage;
+            }
+
+            return sumJoltage;
         }
 
-        internal static List<BatteryBank> ExtractBatteryBanks(string input)
+        internal static List<BatteryBank> ExtractBatteryBanks(string input, uint digits)
         {
             if (string.IsNullOrWhiteSpace(input))
             {
@@ -37,7 +47,7 @@
             var bankStrings = input.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
             foreach (var bankString in bankStrings)
             {
-                banks.Add(new BatteryBank(bankString.Trim()));
+                banks.Add(new BatteryBank(bankString.Trim(), digits));
             }
             return banks;
         }
@@ -45,13 +55,13 @@
 
     internal class BatteryBank
     {
-        internal uint Joltage { get; private set; }
+        internal ulong Joltage { get; private set; }
         internal List<Battery> Batteries { get; private set; }
 
-        public BatteryBank(string bankString)
+        public BatteryBank(string bankString, uint digits)
         {
             Batteries = ExtractBatteries(bankString);
-            Joltage = CalculateProducedJoltage(Batteries);
+            Joltage = CalculateProducedJoltage(Batteries, digits);
         }
 
         internal static List<Battery> ExtractBatteries(string input)
@@ -70,56 +80,62 @@
             return batteries;
         }
 
-        internal static (uint first, uint second) GetLargestTwoDigitNumber(List<uint> numbers)
+        internal static List<ulong> GetLargestNDigitNumber(List<ulong> numbers, uint digits)
         {
-            if (numbers == null || numbers.Count < 2)
+            if (numbers == null || numbers.Count < digits)
             {
-                throw new ArgumentException("List must contain at least two numbers");
+                throw new ArgumentException($"List must contain at least {digits} numbers");
             }
 
-            uint maxNumber = 0;
-            uint bestFirst = 0;
-            uint bestSecond = 0;
-            uint currentFirst = numbers[0];
+            var result = new List<ulong>((int)digits);
+            uint remaining = digits;
+            int startPos = 0;
 
-            // Go left to right, track the best first digit seen so far
-            for (int i = 1; i < numbers.Count; i++)
+            while (remaining > 0)
             {
-                // Form a two-digit number with current best first digit and current number
-                uint candidate = currentFirst * 10 + numbers[i];
-                if (candidate > maxNumber)
+                uint searchLimit = (uint)numbers.Count - remaining + 1;
+
+                ulong maxDigit = 0;
+                int maxPos = startPos;
+
+                for (int i = startPos; i < searchLimit; i++)
                 {
-                    maxNumber = candidate;
-                    bestFirst = currentFirst;
-                    bestSecond = numbers[i];
+                    if (numbers[i] > maxDigit)
+                    {
+                        maxDigit = numbers[i];
+                        maxPos = i;
+                    }
                 }
 
-                // Update the best first digit if current number is better
-                if (numbers[i] > currentFirst)
-                {
-                    currentFirst = numbers[i];
-                }
+                result.Add(maxDigit);
+                startPos = maxPos + 1;
+                remaining--;
             }
 
-            return (bestFirst, bestSecond);
+            return result;
         }
 
-        internal static uint CalculateProducedJoltage(List<Battery> batteries)
+        internal static ulong CalculateProducedJoltage(List<Battery> batteries, uint digits)
         {
-            if (batteries == null || batteries.Count < 2)
+            if (batteries == null || batteries.Count < digits)
             {
-                throw new ArgumentException("List must contain at least two numbers");
+                throw new ArgumentException($"List must contain at least {digits} numbers");
             }
 
-            var (first, second) = GetLargestTwoDigitNumber([.. batteries.Select(b => b.JoltageRating)]);
-            var combinedString = first.ToString() + second.ToString();
-            return uint.Parse(combinedString);
+            var ratings = GetLargestNDigitNumber([.. batteries.Select(b => b.JoltageRating)], digits);
+            var combinedString = string.Empty;
+            foreach (var rating in ratings)
+            {
+                combinedString += rating.ToString();
+            }
+
+            return ulong.Parse(combinedString);
         }
     }
 
     internal class Battery
     {
-        internal uint JoltageRating { get; }
+        internal ulong JoltageRating { get; }
 
         internal Battery(char rating)
         {
@@ -128,7 +144,7 @@
                 throw new ArgumentException("Battery rating must be a digit character.", nameof(rating));
             }
 
-            JoltageRating = (uint)(rating - '0');
+            JoltageRating = (ulong)(rating - '0');
         }
     }
 }
