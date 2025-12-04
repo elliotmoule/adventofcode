@@ -50,6 +50,51 @@
 
         public BatteryBank(string bankString)
         {
+            Batteries = ExtractBatteries(bankString);
+            Joltage = CalculateProducedJoltage(Batteries);
+        }
+
+        internal static List<Battery> ExtractBatteries(string input)
+        {
+            var batteries = new List<Battery>();
+            foreach (var rating in input)
+            {
+                batteries.Add(new Battery(rating));
+            }
+
+            return batteries;
+        }
+
+        internal static (uint first, uint second) GetLargestNumbers(List<uint> numbers)
+        {
+            if (numbers == null || numbers.Count < 2)
+            {
+                throw new ArgumentException("The list must contain at least two numbers.");
+            }
+
+            uint firstLargest = 0;
+            uint secondLargest = 0;
+            foreach (var number in numbers)
+            {
+                if (number > firstLargest)
+                {
+                    secondLargest = firstLargest;
+                    firstLargest = number;
+                }
+                else if (number > secondLargest && number != firstLargest)
+                {
+                    secondLargest = number;
+                }
+            }
+
+            return (firstLargest, secondLargest);
+        }
+
+        internal static uint CalculateProducedJoltage(List<Battery> batteries)
+        {
+            var (first, second) = GetLargestNumbers([.. batteries.Select(b => b.JoltageRating)]);
+            var combinedString = first.ToString() + second.ToString();
+            return uint.Parse(combinedString);
         }
     }
 
@@ -57,7 +102,7 @@
     {
         internal uint JoltageRating { get; private set; }
 
-        public Battery()
+        public Battery(char rating)
         {
         }
     }

@@ -32,6 +32,26 @@
         }
 
         [Test]
+        public void SumOfProducedJoltage_WhenInvalidInputIsProvided_ShouldReturn0()
+        {
+            // Arrange
+            var input =
+                """
+                987654321111111
+                ThisIsInvalidInput
+                234234234234278
+                818181911112111
+                """;
+
+            // Act
+            var result = Business.Year2025.Day3.SumOfProducedJoltage(input);
+
+            // Assert
+            uint expected = 0;
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
         public void ExtractBatteryBanks_WhenInputIsProvided_ShouldReturnCorrectNumberOfBanks()
         {
             // Arrange
@@ -55,6 +75,24 @@
             // Act & Assert
             var ex = Assert.Throws<ArgumentException>(() => Business.Year2025.Day3.ExtractBatteryBanks(input));
             Assert.That(ex.ParamName, Is.EqualTo("input"));
+        }
+
+        [Test]
+        public void ExtractBatteryBanks_WhenInvalidInputIsProvided_ShouldReturn0()
+        {
+            // Arrange
+            var input =
+                """
+                1234567890
+                InvalidInputHere
+                1111111111
+                """;
+
+            // Act
+            var banks = Business.Year2025.Day3.ExtractBatteryBanks(input);
+
+            // Assert
+            Assert.That(banks, Has.Count.EqualTo(0));
         }
     }
 }
