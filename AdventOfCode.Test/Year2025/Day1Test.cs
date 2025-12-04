@@ -54,19 +54,7 @@ namespace AdventOfCode.Test.Year2025
         public void CalculateNumberOfTimesDialIsAt0_WhenInstructionsProvided_ReturnsCorrectNumberOfTimesDialIsAt0()
         {
             // Arrange
-            var instructions = new string[]
-            {
-                "L68",
-                "L30",
-                "R48",
-                "L5",
-                "R60",
-                "L55",
-                "L1",
-                "L99",
-                "R14",
-                "L82",
-            };
+            var instructions = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Example", "Day1_Input.txt"));
 
             // Act
             var result = Day1.CalculateNumberOfTimesDialIsAt0(instructions);
@@ -80,19 +68,7 @@ namespace AdventOfCode.Test.Year2025
         public void CalculateNumberOfTimesDialPasses0_WhenInstructionsProvided_ReturnsCorrectNumberOfTimesDialPasses0()
         {
             // Arrange
-            var instructions = new string[]
-            {
-                "L68",
-                "L30",
-                "R48",
-                "L5",
-                "R60",
-                "L55",
-                "L1",
-                "L99",
-                "R14",
-                "L82",
-            };
+            var instructions = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Example", "Day1_Input.txt"));
 
             // Act
             var result = Day1.CalculateNumberOfTimesDialPasses0(instructions);

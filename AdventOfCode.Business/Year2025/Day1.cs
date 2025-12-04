@@ -7,7 +7,7 @@
 
         public void ExecutePart1()
         {
-            var day1Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Day1_Input.txt"));
+            var day1Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day1_Input.txt"));
             var result = CalculateNumberOfTimesDialIsAt0(day1Input);
 
             Console.WriteLine($"\r\nThe dial was at position 0 a total of {result} times.\r\n");
@@ -15,7 +15,7 @@
 
         public void ExecutePart2()
         {
-            var day1Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Day1_Input.txt"));
+            var day1Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day1_Input.txt"));
             var result = CalculateNumberOfTimesDialPasses0(day1Input);
 
             Console.WriteLine($"\r\nThe dial passed position 0 a total of {result} times.\r\n");

@@ -7,19 +7,34 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="Year2025\Resources\Day1_Input.txt">
+    <None Update="Year2025\Resources\Actual\Day1_Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Year2025\Resources\Day2_Input.txt">
+    <None Update="Year2025\Resources\Actual\Day2_Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Year2025\Resources\Day3_Input.txt">
+    <None Update="Year2025\Resources\Actual\Day3_Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Year2025\Resources\Day1_Input.txt">
+    <None Update="Year2025\Resources\Actual\Day1_Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Year2025\Resources\Day2_Input.txt">
+    <None Update="Year2025\Resources\Actual\Day2_Input.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Year2025\Resources\Actual\Day4_Input.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Year2025\Resources\Example\Day1_Input.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Year2025\Resources\Example\Day2_Input.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Year2025\Resources\Example\Day3_Input.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Year2025\Resources\Example\Day4_Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

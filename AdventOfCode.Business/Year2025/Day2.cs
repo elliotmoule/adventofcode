@@ -4,7 +4,7 @@
     {
         public void ExecutePart1()
         {
-            var day2Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Day2_Input.txt"));
+            var day2Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Actual", "Day2_Input.txt"));
             var result = SumOfRepeatedSequenceProductsInRanges(
                     CommaDelimitedList(day2Input)
                     .Select(ParseProductRange),
@@ -16,7 +16,7 @@
 
         public void ExecutePart2()
         {
-            var day2Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Day2_Input.txt"));
+            var day2Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Actual", "Day2_Input.txt"));
             var result = SumOfRepeatedSequenceProductsInRanges(
                     CommaDelimitedList(day2Input)
                     .Select(ParseProductRange),

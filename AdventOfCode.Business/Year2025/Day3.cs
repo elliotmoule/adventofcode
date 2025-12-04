@@ -4,7 +4,7 @@
     {
         public void ExecutePart1()
         {
-            var day3Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Day3_Input.txt"));
+            var day3Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Actual", "Day3_Input.txt"));
             var result = SumOfProducedJoltage(day3Input, 2);
 
             Console.WriteLine($"\r\nThe total output joltage is {result}.\r\n");
@@ -12,7 +12,7 @@
 
         public void ExecutePart2()
         {
-            var day3Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Day3_Input.txt"));
+            var day3Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Actual", "Day3_Input.txt"));
             var result = SumOfProducedJoltage(day3Input, 12);
 
             Console.WriteLine($"\r\nThe total output joltage is {result}.\r\n");

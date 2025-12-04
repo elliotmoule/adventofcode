@@ -7,13 +7,7 @@
         public void SumOfProducedJoltage_WhenInputIsProvided_ShouldReturnExpectedResult(uint digits, ulong expected)
         {
             // Arrange
-            var input =
-                """
-                987654321111111
-                811111111111119
-                234234234234278
-                818181911112111
-                """;
+            var input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Example", "Day3_Input.txt"));
 
             // Act
             var result = Business.Year2025.Day3.SumOfProducedJoltage(input, digits);
@@ -37,10 +31,10 @@
             // Arrange
             var input =
                 """
-                987654321111111
+                123456789123456
                 ThisIsInvalidInput
-                234234234234278
-                818181911112111
+                987654321987654
+                111111111111111
                 """;
 
             // Act & Assert
@@ -59,7 +53,7 @@
             var input =
                 """
                 1234567891234567891
-                9876543219876543219
+                9876543219876541234
                 1111111111111111111
                 """;
             // Act
