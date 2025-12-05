@@ -1,4 +1,5 @@
 ﻿using AdventOfCode.Business.Year2025;
+using static AdventOfCode.Business.Year2025.Day2;
 
 namespace AdventOfCode.Test.Year2025
 {

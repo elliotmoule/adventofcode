@@ -88,11 +88,11 @@
         }
 
         internal static bool IsAtZeroPosition(int currentPosition) => currentPosition == 0;
-    }
 
-    internal enum Direction
-    {
-        Left,
-        Right
+        internal enum Direction
+        {
+            Left,
+            Right
+        }
     }
 }

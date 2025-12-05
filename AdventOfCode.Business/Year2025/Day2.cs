@@ -172,13 +172,13 @@
 
             return input.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         }
-    }
 
-    internal record ProductRange(ulong Start, ulong End);
+        internal record ProductRange(ulong Start, ulong End);
 
-    internal enum SequenceType
-    {
-        TwiceRepeated,
-        AnyRepeated // Includes TwiceRepeated
+        internal enum SequenceType
+        {
+            TwiceRepeated,
+            AnyRepeated // Includes TwiceRepeated
+        }
     }
 }

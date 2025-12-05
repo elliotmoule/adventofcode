@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode.Test.Year2025
+﻿using static AdventOfCode.Business.Year2025.Day3;
+
+namespace AdventOfCode.Test.Year2025
 {
     internal class Day3Tests
     {
@@ -94,7 +96,7 @@
             var bankString = "1234567890";
 
             // Act
-            var batteries = Business.Year2025.BatteryBank.ExtractBatteries(bankString);
+            var batteries = BatteryBank.ExtractBatteries(bankString);
 
             // Assert
             Assert.That(batteries, Has.Count.EqualTo(10));
@@ -107,7 +109,7 @@
             var bankString = "12A34B6789";
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => Business.Year2025.BatteryBank.ExtractBatteries(bankString));
+            Assert.Throws<ArgumentException>(() => BatteryBank.ExtractBatteries(bankString));
         }
 
         [TestCase("")]
@@ -115,7 +117,7 @@
         public void ExtractBatteries_WhenEmptyBankStringIsProvided_ShouldThrowArgumentException(string bankString)
         {
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => Business.Year2025.BatteryBank.ExtractBatteries(bankString));
+            Assert.Throws<ArgumentException>(() => BatteryBank.ExtractBatteries(bankString));
         }
 
         [Test]
@@ -125,7 +127,7 @@
             List<ulong> numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
             // Act
-            var result = Business.Year2025.BatteryBank.GetLargestNDigitNumber(numbers, 2);
+            var result = BatteryBank.GetLargestNDigitNumber(numbers, 2);
 
             // Assert
             Assert.That(result, Is.EquivalentTo([8, 9]));
@@ -138,7 +140,7 @@
             List<ulong> numbers = [1];
 
             // Act & Assert
-            var ex = Assert.Throws<ArgumentException>(() => Business.Year2025.BatteryBank.GetLargestNDigitNumber(numbers, 2));
+            var ex = Assert.Throws<ArgumentException>(() => BatteryBank.GetLargestNDigitNumber(numbers, 2));
             Assert.That(ex.Message, Does.Contain("at least 2 numbers"));
         }
 
@@ -149,7 +151,7 @@
             List<ulong>? numbers = null;
 
             // Act & Assert
-            var ex = Assert.Throws<ArgumentException>(() => Business.Year2025.BatteryBank.GetLargestNDigitNumber(numbers!, 2));
+            var ex = Assert.Throws<ArgumentException>(() => BatteryBank.GetLargestNDigitNumber(numbers!, 2));
             Assert.That(ex.Message, Does.Contain("at least 2 numbers"));
         }
 
@@ -171,7 +173,7 @@
             // Act
             foreach (var battery in batteries)
             {
-                var result = Business.Year2025.BatteryBank.GetLargestNDigitNumber(battery, 2);
+                var result = BatteryBank.GetLargestNDigitNumber(battery, 2);
                 actualValues.Add(actualValues.Count, result);
             }
 
@@ -200,7 +202,7 @@
         public void CalculateProducedJoltage_WhenBatteriesAreProvided_ShouldReturnCorrectJoltage(uint digits, ulong expected)
         {
             // Arrange
-            var batteries = new List<Business.Year2025.Battery>
+            var batteries = new List<BatteryBank.Battery>
             {
                 new('9'),
                 new('5'),
@@ -220,7 +222,7 @@
             };
 
             // Act
-            var joltage = Business.Year2025.BatteryBank.CalculateProducedJoltage(batteries, digits);
+            var joltage = BatteryBank.CalculateProducedJoltage(batteries, digits);
 
             // Assert
             var expectedJoltage = expected;
@@ -231,10 +233,10 @@
         public void CalculateProducedJoltage_WhenNoBatteriesAreProvided_ShouldThrowArgumentException()
         {
             // Arrange
-            var batteries = new List<Business.Year2025.Battery>();
+            var batteries = new List<BatteryBank.Battery>();
 
             // Act & Assert
-            var ex = Assert.Throws<ArgumentException>(() => Business.Year2025.BatteryBank.CalculateProducedJoltage(batteries, 2));
+            var ex = Assert.Throws<ArgumentException>(() => BatteryBank.CalculateProducedJoltage(batteries, 2));
             Assert.That(ex.Message, Does.Contain("at least 2 numbers"));
         }
 
@@ -248,7 +250,7 @@
             };
 
             // Act
-            var result = Business.Year2025.BatteryBank.GetLargestNDigitNumber(batteries, 2);
+            var result = BatteryBank.GetLargestNDigitNumber(batteries, 2);
 
             // Assert
             Assert.That(result, Is.EquivalentTo(new List<uint> { 8, 7 }));
@@ -264,7 +266,7 @@
             };
 
             // Act
-            var result = Business.Year2025.BatteryBank.GetLargestNDigitNumber(batteries, 4);
+            var result = BatteryBank.GetLargestNDigitNumber(batteries, 4);
 
             // Assert
             Assert.That(result, Is.EquivalentTo(new List<uint> { 8, 3, 5, 7 }));
@@ -280,7 +282,7 @@
             };
 
             // Act
-            var result = Business.Year2025.BatteryBank.GetLargestNDigitNumber(batteries, 8);
+            var result = BatteryBank.GetLargestNDigitNumber(batteries, 8);
 
             // Assert
             Assert.That(result, Is.EquivalentTo(new List<uint> { 8, 8, 2, 4, 1, 7, 5, 3 }));
@@ -296,7 +298,7 @@
             };
 
             // Act
-            var result = Business.Year2025.BatteryBank.GetLargestNDigitNumber(batteries, 8);
+            var result = BatteryBank.GetLargestNDigitNumber(batteries, 8);
 
             // Assert
             Assert.That(result, Is.EquivalentTo(new List<uint> { 8, 8, 2, 4, 1, 7, 5, 3 }));
