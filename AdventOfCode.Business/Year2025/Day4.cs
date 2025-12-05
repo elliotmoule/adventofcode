@@ -5,7 +5,7 @@
         public void ExecutePart1()
         {
             var day4Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day4_Input.txt"));
-            var result = CalculateHowManyPaperRollsAreAccessible(day4Input, 8, 4);
+            var result = CalculateHowManyPaperRollsAreAccessible(day4Input, 1, 4);
 
             Console.WriteLine($"\r\nCan access {result} rolls of paper with the forklift.\r\n");
         }
@@ -15,9 +15,35 @@
             throw new NotImplementedException();
         }
 
-        internal static uint CalculateHowManyPaperRollsAreAccessible(string[] input, uint adjacentPositions, uint maxAdjacentRolls)
+        internal static uint CalculateHowManyPaperRollsAreAccessible(string[] input, uint adjacentPositionDistance, uint maxAdjacentRolls)
         {
-            return 0;
+            ArgumentNullException.ThrowIfNull(input);
+
+            if (input.Length == 0)
+            {
+                return 0;
+            }
+
+            (uint rows, uint columns) = GetGridSize(input);
+            var matrix = CreateMatrix(rows, columns, adjacentPositionDistance, input);
+
+            var countOfAccessibleRolls = 0u;
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    var cell = matrix[i][j];
+                    if (cell.Type == CellType.Paper)
+                    {
+                        if (!cell.HasNAdjacentCellsOfType(matrix, CellType.Paper, maxAdjacentRolls))
+                        {
+                            countOfAccessibleRolls++;
+                        }
+                    }
+                }
+            }
+
+            return countOfAccessibleRolls;
         }
 
         internal static (uint rows, uint columns) GetGridSize(string[] input)
@@ -35,11 +61,11 @@
             return (rows, columns);
         }
 
-        internal static Cell[][] CreateMatrix(uint rows, uint columns, uint adjacentPositions, string[] input)
+        internal static Cell[][] CreateMatrix(uint rows, uint columns, uint adjacentPositionDistance, string[] input)
         {
             ArgumentNullException.ThrowIfNull(input);
 
-            if (input.Length != rows || input[0].Length != columns)
+            if (input.Length != rows || input.Length < 1 || input[0].Length != columns)
             {
                 throw new FormatException("Input string is either null, empty, or does not match the expected column size.");
             }
@@ -57,7 +83,7 @@
 
                 for (int j = 0; j < columns; j++)
                 {
-                    var adjacentCells = GetAdjacentCellVectors(new UVector((uint)i, (uint)j), rows, columns, adjacentPositions);
+                    var adjacentCells = GetAdjacentCellVectors(new UVector((uint)i, (uint)j), rows, columns, adjacentPositionDistance);
                     matrix[i][j] = CreateCell(input[i][j], new((uint)i, (uint)j), adjacentCells);
                 }
             }
@@ -68,29 +94,27 @@
         internal static List<UVector> GetAdjacentCellVectors(UVector position, uint maxRows, uint maxColumns, uint adjacentPositionDistance)
         {
             ArgumentNullException.ThrowIfNull(position);
-
             if (adjacentPositionDistance == 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(adjacentPositionDistance), "Distance must be greater than zero.");
+                return [];
             }
 
             List<UVector> adjacentPositions = [];
-
             for (int i = 0; i < maxRows; i++)
             {
                 for (int j = 0; j < maxColumns; j++)
                 {
                     var rowDiff = Math.Abs((int)position.Row - i);
                     var colDiff = Math.Abs((int)position.Column - j);
-                    if ((rowDiff == adjacentPositionDistance && colDiff == 0) ||
-                        (rowDiff == 0 && colDiff == adjacentPositionDistance) ||
-                        (rowDiff == adjacentPositionDistance && colDiff == adjacentPositionDistance))
+
+                    if ((rowDiff > 0 || colDiff > 0) &&
+                        rowDiff <= adjacentPositionDistance &&
+                        colDiff <= adjacentPositionDistance)
                     {
                         adjacentPositions.Add(new UVector((uint)i, (uint)j));
                     }
                 }
             }
-
             return adjacentPositions;
         }
 
@@ -118,6 +142,8 @@
 
             public bool HasNAdjacentCellsOfType(Cell[][] matrix, CellType cellType, uint n)
             {
+                ArgumentNullException.ThrowIfNull(matrix);
+
                 uint count = 0;
                 foreach (var adjacent in AdjacentCells)
                 {
