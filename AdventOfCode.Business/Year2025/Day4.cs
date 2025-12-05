@@ -12,7 +12,53 @@
 
         public void ExecutePart2()
         {
-            throw new NotImplementedException();
+            var day4Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day4_Input.txt"));
+            var result = CalculateHowManyPaperRollsCanBeRemoved(day4Input, 1, 4);
+
+            Console.WriteLine($"\r\nCan remove {result} rolls of paper with the forklift.\r\n");
+        }
+
+        internal static uint CalculateHowManyPaperRollsCanBeRemoved(string[] input, uint adjacentPositionDistance, uint maxAdjacentRolls)
+        {
+            ArgumentNullException.ThrowIfNull(input);
+            if (input.Length == 0)
+            {
+                return 0;
+            }
+
+            (uint rows, uint columns) = GetGridSize(input);
+            var matrix = CreateMatrix(rows, columns, adjacentPositionDistance, input);
+
+            var countOfRemovableRolls = 0u;
+            var rollsToRemove = new List<Cell>();
+
+            while (countOfRemovableRolls == 0 || rollsToRemove.Count > 0)
+            {
+                for (int i = rollsToRemove.Count; i-- > 0;)
+                {
+                    var cell = rollsToRemove[i];
+                    matrix[cell.Vector.Row][cell.Vector.Column].Type = CellType.None;
+                    countOfRemovableRolls++;
+                    rollsToRemove.RemoveAt(i);
+                }
+
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < columns; j++)
+                    {
+                        var cell = matrix[i][j];
+                        if (cell.Type == CellType.Paper)
+                        {
+                            if (!cell.HasNAdjacentCellsOfType(matrix, CellType.Paper, maxAdjacentRolls))
+                            {
+                                rollsToRemove.Add(cell);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return countOfRemovableRolls;
         }
 
         internal static uint CalculateHowManyPaperRollsAreAccessible(string[] input, uint adjacentPositionDistance, uint maxAdjacentRolls)

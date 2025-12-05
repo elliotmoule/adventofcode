@@ -20,6 +20,19 @@ namespace AdventOfCode.Test.Year2025
             """;
 
         [Test]
+        public void CalculateHowManyPaperRollsCanBeRemoved_ValidInput_ReturnsCorrectCount()
+        {
+            // Arrange
+            var inputLines = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Example", "Day4_Input.txt"));
+
+            // Act
+            var result = Day4.CalculateHowManyPaperRollsCanBeRemoved(inputLines, 1, 4);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(43u));
+        }
+
+        [Test]
         public void CalculateHowManyPaperRollsAreAccessible_ValidInput_ReturnsCorrectCount()
         {
             // Arrange
