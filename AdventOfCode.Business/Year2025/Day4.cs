@@ -20,9 +20,19 @@
             return 0;
         }
 
-        internal static (uint rows, uint columns) GetGridSize(string input)
+        internal static (uint rows, uint columns) GetGridSize(string[] input)
         {
-            return (0, 0);
+            ArgumentNullException.ThrowIfNull(input);
+
+            if (input.Length == 0 || string.IsNullOrWhiteSpace(input[0]))
+            {
+                return (0, 0);
+            }
+
+            var rows = (uint)input.Length;
+            var columns = (uint)input[0].Length;
+
+            return (rows, columns);
         }
 
         internal static uint[][] CreateMatrix(uint row, uint columns, string input)

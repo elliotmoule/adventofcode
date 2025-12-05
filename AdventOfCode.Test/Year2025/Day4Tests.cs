@@ -20,12 +20,12 @@
         public void GetGridSize_ValidInput_ReturnsCorrectSize()
         {
             // Act
-            var (rows, columns) = AdventOfCode.Business.Year2025.Day4.GetGridSize(TestInput);
+            var (rows, columns) = AdventOfCode.Business.Year2025.Day4.GetGridSize(TestInput.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries));
 
             // Assert
             Assert.Multiple(() =>
             {
-                Assert.That(rows, Is.EqualTo(5ul));
+                Assert.That(rows, Is.EqualTo(10ul));
                 Assert.That(columns, Is.EqualTo(10ul));
             });
         }
@@ -35,7 +35,7 @@
         public void GetGridSize_EmptyOrWhiteSpaceInput_ReturnsZeroSize(string input)
         {
             // Act
-            var (rows, columns) = AdventOfCode.Business.Year2025.Day4.GetGridSize(input);
+            var (rows, columns) = AdventOfCode.Business.Year2025.Day4.GetGridSize([input]);
 
             // Assert
             Assert.Multiple(() =>
@@ -49,7 +49,7 @@
         public void GetGridSize_SingleLineInput_ReturnsCorrectSize()
         {
             // Act
-            var (rows, columns) = AdventOfCode.Business.Year2025.Day4.GetGridSize("@.@.@.@.@.");
+            var (rows, columns) = AdventOfCode.Business.Year2025.Day4.GetGridSize(["@.@.@.@.@."]);
             // Assert
             Assert.Multiple(() =>
             {
@@ -61,20 +61,12 @@
         [Test]
         public void GetGridSize_SingleColumnInput_ReturnsCorrectSize()
         {
+            // Arrange
+            string[] input = ["@", ".", "@", ".", "@", ".", "@", ".", "@", "."];
+
             // Act
-            var (rows, columns) = AdventOfCode.Business.Year2025.Day4.GetGridSize(
-                """
-                @
-                .
-                @
-                .
-                @
-                .
-                @
-                .
-                @
-                .
-                """);
+            var (rows, columns) = AdventOfCode.Business.Year2025.Day4.GetGridSize(input);
+
             // Assert
             Assert.Multiple(() =>
             {
@@ -97,41 +89,56 @@
         public void CreateMatrix_ValidInput_ReturnsCorrectMatrix()
         {
             // Arrange
+            var expected = new uint[][]
+            {
+                [1, 1, 1],
+                [0, 1, 0],
+                [1, 0, 1],
+            };
+
+            var input =
+                """
+                @@@
+                .@.
+                @.@
+                """;
 
             // Act
+            var result = AdventOfCode.Business.Year2025.Day4.CreateMatrix(3, 3, input);
 
             // Assert
+            Assert.That(result, Is.EquivalentTo(expected));
         }
 
         [Test]
         public void CreateMatrix_InvalidInput_ThrowsArgumentException()
         {
-            // Arrange
-
-            // Act
-
-            // Assert
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() =>
+            {
+                AdventOfCode.Business.Year2025.Day4.CreateMatrix(3, 3, "@.@");
+            });
         }
 
         [Test]
         public void CreateMatrix_NullInput_ThrowsArgumentException()
         {
-            // Arrange
-
-            // Act
-
-            // Assert
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                AdventOfCode.Business.Year2025.Day4.CreateMatrix(3, 3, null!);
+            });
         }
 
         [TestCase("")]
         [TestCase("     ")]
         public void CreateMatrix_EmptyOrWhiteSpace_ThrowsArgumentException(string input)
         {
-            // Arrange
-
-            // Act
-
-            // Assert
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() =>
+            {
+                AdventOfCode.Business.Year2025.Day4.CreateMatrix(3, 3, input);
+            });
         }
 
         [Test]
