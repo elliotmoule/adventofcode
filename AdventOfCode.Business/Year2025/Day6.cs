@@ -26,7 +26,7 @@
 
             var columns = RetrieveColumns(operations.Count, input);
 
-            if (operations.Count != columns.Max(x => x.Key))
+            if (operations.Count != columns.Count)
             {
                 throw new FormatException("The provided operations count does not equal the column values count.");
             }
@@ -87,16 +87,23 @@
 
             foreach (var row in input)
             {
-                var columnValues = RetrieveColumnValues(row);
-
-                if (index == operations)
+                if (index == input.Length - 1)
                 {
                     break;  // Last column.
                 }
 
+                var columnValues = RetrieveColumnValues(row);
+
                 for (uint i = 0; i < columnValues.Count; i++)
                 {
-                    lists[i].Add(columnValues[(int)i]);
+                    if (lists.TryGetValue(i, out List<long>? value))
+                    {
+                        value.Add(columnValues[(int)i]);
+                    }
+                    else
+                    {
+                        lists.Add(i, [columnValues[(int)i]]);
+                    }
                 }
                 index++;
             }

@@ -91,7 +91,7 @@ namespace AdventOfCode.Test.Year2025
         public void CalculateByOperation_OperationIsNotMathematicOperation_ThrowsArgumentException()
         {
             // Act & Arrange
-            Assert.Throws<ArgumentNullException>(() => CalculateByOperation('a', 1, 2));
+            Assert.Throws<ArgumentException>(() => CalculateByOperation('a', 1, 2));
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace AdventOfCode.Test.Year2025
             var result = CalculateByOperation('/', 2, 1);
 
             // Assert
-            Assert.That(result, Is.EqualTo(1));
+            Assert.That(result, Is.EqualTo(2));
         }
 
         [Test]
@@ -131,7 +131,7 @@ namespace AdventOfCode.Test.Year2025
             var result = CalculateByOperation('*', 2, 1);
 
             // Assert
-            Assert.That(result, Is.EqualTo(1));
+            Assert.That(result, Is.EqualTo(2));
         }
 
         [Test]
@@ -141,7 +141,7 @@ namespace AdventOfCode.Test.Year2025
             var result = CalculateByOperation('+', 2, 1);
 
             // Assert
-            Assert.That(result, Is.EqualTo(1));
+            Assert.That(result, Is.EqualTo(3));
         }
 
         [Test]
@@ -203,7 +203,7 @@ namespace AdventOfCode.Test.Year2025
         public void RetrieveColumnValues_RowIsEmptyOrWhiteSpace_ThrowsArgumentNullException(string input)
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => RetrieveColumnValues(input));
+            Assert.Throws<ArgumentException>(() => RetrieveColumnValues(input));
         }
 
         [Test]
@@ -313,10 +313,10 @@ namespace AdventOfCode.Test.Year2025
             // Arrange
             Dictionary<uint, List<long>> expectedColumns = new()
             {
-                { 0, [123, 456, 789, 123] },
-                { 1, [456, 789, 123, 456] },
-                { 2, [789, 123, 456, 789] },
-                { 3, [321, 654, 987, 321] },
+                { 0, [123, 456, 789, 321] },
+                { 1, [456, 789, 123, 654] },
+                { 2, [789, 123, 456, 987] },
+                { 3, [123, 456, 789, 321] },
             };
             string[] input =
             [
@@ -329,15 +329,17 @@ namespace AdventOfCode.Test.Year2025
 
             // Act
             var actual = RetrieveColumns(4, input);
+            var last = actual.Last();
 
             // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(actual, Has.Count.EqualTo(4));
-                Assert.That(actual[0][0], Is.EqualTo(expectedColumns[0][0]));
-                Assert.That(actual[2][2], Is.EqualTo(expectedColumns[2][2]));
-                Assert.That(actual.Last().Value[0], Is.EqualTo(expectedColumns[3][321]));
-            });
+            Assert.That(actual, Has.Count.EqualTo(4));
+            Assert.That(actual[0][0], Is.EqualTo(expectedColumns[0][0]));
+            Assert.That(actual[2][2], Is.EqualTo(expectedColumns[2][2]));
+            Assert.That(last.Value[3], Is.EqualTo(expectedColumns[3][3]));
+            //Assert.Multiple(() =>
+            //{
+
+            //});
         }
 
         [Test]
