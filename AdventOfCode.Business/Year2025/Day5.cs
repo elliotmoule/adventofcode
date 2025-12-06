@@ -7,12 +7,15 @@
             var day5Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day5_Input.txt"));
             var result = CalculateHowManyIngredientsAreFresh(day5Input);
 
-            Console.WriteLine($"\r\nThere are {result} fresh ingredient IDs.\r\n");
+            Console.WriteLine($"\r\nThere are {result} fresh available ingredient IDs.\r\n");
         }
 
         public void ExecutePart2()
         {
-            throw new NotImplementedException();
+            var day5Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day5_Input.txt"));
+            var result = CalculateHowManyFreshIdsWithinFreshRanges(day5Input);
+
+            Console.WriteLine($"\r\nThere are {result} total fresh ingredient IDs.\r\n");
         }
 
         internal static ulong CalculateHowManyFreshIdsWithinFreshRanges(string[] input)
