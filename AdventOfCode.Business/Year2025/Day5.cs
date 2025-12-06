@@ -15,6 +15,68 @@
             throw new NotImplementedException();
         }
 
+        internal static ulong CalculateHowManyFreshIdsWithinFreshRanges(string[] input)
+        {
+            var (_, freshIngredientIds) = BuildIngredientLists(input, true);
+            var mergedRanges = MergeOverlappingRanges(freshIngredientIds);
+            return CountValuesInRanges(mergedRanges);
+        }
+
+        internal static List<URange> MergeOverlappingRanges(List<URange> ranges)
+        {
+            if (ranges == null || ranges.Count == 0)
+            {
+                return [];
+            }
+
+            var sortedRanges = ranges.OrderBy(r => r.Start).ToList();
+
+            var mergedRanges = new List<URange>();
+            ulong currentStart = sortedRanges[0].Start;
+            ulong currentEnd = sortedRanges[0].End;
+
+            for (int i = 1; i < sortedRanges.Count; i++)
+            {
+                var range = sortedRanges[i];
+
+                if (range.Start <= currentEnd + 1)
+                {
+                    currentEnd = Math.Max(currentEnd, range.End);  // Extend the end, to include greater maximum.
+                }
+                else
+                {
+                    mergedRanges.Add(new URange(currentStart, currentEnd));
+                    currentStart = range.Start;
+                    currentEnd = range.End;
+                }
+            }
+
+            // Don't forget to add the last merged range
+            mergedRanges.Add(new URange(currentStart, currentEnd));
+
+            return mergedRanges;
+        }
+
+        internal static ulong CountValuesInRanges(List<URange> ranges)
+        {
+            if (ranges == null || ranges.Count == 0)
+            {
+                return 0;
+            }
+
+            ulong totalCount = 0;
+
+            foreach (var range in ranges)
+            {
+                checked
+                {
+                    totalCount += range.End - range.Start + 1;
+                }
+            }
+
+            return totalCount;
+        }
+
         internal static uint CalculateHowManyIngredientsAreFresh(string[] input)
         {
             ArgumentNullException.ThrowIfNull(input);
@@ -24,14 +86,14 @@
                 return 0u;
             }
 
-            var (ingredientIds, freshIngredientIds) = BuildIngredientLists(input);
+            var (ingredientIds, freshIngredientIds) = BuildIngredientLists(input, false);
 
             var freshCount = GetFreshIngredientCountFromAvailableIngredientIds(ingredientIds, freshIngredientIds);
 
             return freshCount;
         }
 
-        internal static (List<ulong> ingredientIds, List<URange> freshIngredientIds) BuildIngredientLists(string[] input)
+        internal static (List<ulong> ingredientIds, List<URange> freshIngredientIds) BuildIngredientLists(string[] input, bool returnAfterFreshRanges)
         {
             ArgumentNullException.ThrowIfNull(input);
 
@@ -51,6 +113,10 @@
                     if (string.IsNullOrWhiteSpace(line))
                     {
                         isRangeSection = false;
+                        if (returnAfterFreshRanges)
+                        {
+                            return ([], freshIngredientIds);
+                        }
                         continue;
                     }
                     freshIngredientIds.Add(GetRange(line));

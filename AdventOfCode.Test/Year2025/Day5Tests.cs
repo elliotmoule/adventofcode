@@ -6,6 +6,19 @@ namespace AdventOfCode.Test.Year2025
     internal class Day5Tests
     {
         [Test]
+        public void CalculateHowManyFreshIdsWithinFreshRanges_ValidShortInput_ReturnsCorrectResult()
+        {
+            // Arrange
+            var inputLines = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Example", "Day5_Input.txt"));
+
+            // Act
+            var result = Day5.CalculateHowManyFreshIdsWithinFreshRanges(inputLines);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(14u));
+        }
+
+        [Test]
         public void CalculateHowManyIngredientsAreFresh_NullInput_ThrowsArgumentNullException()
         {
             // Act & Assert
@@ -63,14 +76,14 @@ namespace AdventOfCode.Test.Year2025
         public void BuildIngredientLists_NullInput_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => BuildIngredientLists(null!));
+            Assert.Throws<ArgumentNullException>(() => BuildIngredientLists(null!, false));
         }
 
         [Test]
         public void BuildIngredientLists_EmptyInput_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => BuildIngredientLists([]));
+            Assert.Throws<ArgumentException>(() => BuildIngredientLists([], false));
         }
 
         [Test]
@@ -95,7 +108,7 @@ namespace AdventOfCode.Test.Year2025
                 ];
 
             // Act
-            var (ingredientIds, freshIngredientIds) = BuildIngredientLists(input);
+            var (ingredientIds, freshIngredientIds) = BuildIngredientLists(input, false);
 
             // Assert
             Assert.Multiple(() =>
@@ -332,6 +345,216 @@ namespace AdventOfCode.Test.Year2025
 
             // Assert
             Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        public void MergeOverlappingRanges_NoOverlap_ReturnsAllRanges()
+        {
+            // Arrange
+            var ranges = new List<URange>
+            {
+                new(3, 5),
+                new(10, 14),
+            };
+
+            // Act
+            var result = MergeOverlappingRanges(ranges);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Has.Count.EqualTo(2));
+                Assert.That(result[0].Start, Is.EqualTo(3UL));
+                Assert.That(result[0].End, Is.EqualTo(5UL));
+                Assert.That(result[1].Start, Is.EqualTo(10UL));
+                Assert.That(result[1].End, Is.EqualTo(14UL));
+            });
+        }
+
+        [Test]
+        public void MergeOverlappingRanges_WithOverlap_MergesCorrectly()
+        {
+            // Arrange
+            var ranges = new List<URange>
+            {
+                new(3, 5),
+                new(10, 14),
+                new(16, 20),
+                new(12, 18),
+            };
+
+            // Act
+            var result = MergeOverlappingRanges(ranges);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Has.Count.EqualTo(2));
+                Assert.That(result[0].Start, Is.EqualTo(3UL));
+                Assert.That(result[0].End, Is.EqualTo(5UL));
+                Assert.That(result[1].Start, Is.EqualTo(10UL));
+                Assert.That(result[1].End, Is.EqualTo(20UL));
+            });
+        }
+
+        [Test]
+        public void MergeOverlappingRanges_AdjacentRanges_MergesThem()
+        {
+            // Arrange
+            var ranges = new List<URange>
+            {
+                new(5, 10),
+                new(11, 15),
+            };
+
+            // Act
+            var result = MergeOverlappingRanges(ranges);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Has.Count.EqualTo(1));
+                Assert.That(result[0].Start, Is.EqualTo(5UL));
+                Assert.That(result[0].End, Is.EqualTo(15UL));
+            });
+        }
+
+        [Test]
+        public void MergeOverlappingRanges_CompletelyNestedRange_MergesCorrectly()
+        {
+            // Arrange
+            var ranges = new List<URange>
+            {
+                new(5, 20),
+                new(8, 12),
+            };
+
+            // Act
+            var result = MergeOverlappingRanges(ranges);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Has.Count.EqualTo(1));
+                Assert.That(result[0].Start, Is.EqualTo(5UL));
+                Assert.That(result[0].End, Is.EqualTo(20UL));
+            });
+        }
+
+        [Test]
+        public void MergeOverlappingRanges_EmptyList_ReturnsEmpty()
+        {
+            // Arrange
+            var ranges = new List<URange>();
+
+            // Act
+            var result = MergeOverlappingRanges(ranges);
+
+            // Assert
+            Assert.That(result, Has.Count.EqualTo(0));
+        }
+
+        [Test]
+        public void MergeOverlappingRanges_SingleRange_ReturnsSameRange()
+        {
+            // Arrange
+            var ranges = new List<URange>
+            {
+                new(10,20),
+            };
+
+            // Act
+            var result = MergeOverlappingRanges(ranges);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Has.Count.EqualTo(1));
+                Assert.That(result[0].Start, Is.EqualTo(10UL));
+                Assert.That(result[0].End, Is.EqualTo(20UL));
+            });
+        }
+
+        [Test]
+        public void CountValuesInRanges_SingleRange_CountsCorrectly()
+        {
+            // Arrange
+            var ranges = new List<URange>
+            {
+                new(5, 10),
+            };
+
+            // Act
+            var result = CountValuesInRanges(ranges);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(6UL));
+        }
+
+        [Test]
+        public void CountValuesInRanges_MultipleRanges_CountsCorrectly()
+        {
+            // Arrange
+            var ranges = new List<URange>
+            {
+                new(3, 5 ),
+                new(10, 20),
+            };
+
+            // Act
+            var result = CountValuesInRanges(ranges);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(14UL));
+        }
+
+        [Test]
+        public void CountValuesInRanges_EmptyList_ReturnsZero()
+        {
+            // Arrange
+            var ranges = new List<URange>();
+
+            // Act
+            var result = CountValuesInRanges(ranges);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(0UL));
+        }
+
+        [Test]
+        public void CountValuesInRanges_SingleValueRange_ReturnsOne()
+        {
+            // Arrange
+            var ranges = new List<URange>
+            {
+                new (5,5),
+            };
+
+            // Act
+            var result = CountValuesInRanges(ranges);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(1UL));
+        }
+
+        [Test]
+        public void Integration_OverlappingRanges_ReturnsCorrectCount()
+        {
+            // Arrange
+            var ranges = new List<URange>
+            {
+                new(3, 5),
+                new(10, 14),
+                new(16, 20),
+                new(12, 18),
+            };
+
+            // Act
+            var merged = MergeOverlappingRanges(ranges);
+            var count = CountValuesInRanges(merged);
+
+            // Assert
+            Assert.That(count, Is.EqualTo(14));
         }
     }
 }
