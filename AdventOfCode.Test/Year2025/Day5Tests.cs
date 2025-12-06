@@ -23,10 +23,34 @@ namespace AdventOfCode.Test.Year2025
         }
 
         [Test]
-        public void CalculateHowManyIngredientsAreFresh_ValidInput_ReturnsCorrectResult()
+        public void CalculateHowManyIngredientsAreFresh_ValidShortInput_ReturnsCorrectResult()
         {
             // Arrange
             var inputLines = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Example", "Day5_Input.txt"));
+
+            // Act
+            var result = Day5.CalculateHowManyIngredientsAreFresh(inputLines);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(3u));
+        }
+
+        [Test]
+        public void CalculateHowManyIngredientsAreFresh_ValidLongInput_ReturnsCorrectResult()
+        {
+            // Arrange
+            string[] inputLines =
+            [
+                "155212176866261-163127841533232",
+                "124646211327227-148172726118633",
+                "",
+                "155346879709739",
+                "416106857700518",
+                "142630980526821",
+                "426134376523642",
+                "136311093050199",
+                "555976078480392",
+            ];
 
             // Act
             var result = Day5.CalculateHowManyIngredientsAreFresh(inputLines);
@@ -54,8 +78,8 @@ namespace AdventOfCode.Test.Year2025
         {
             // Arrange
             List<ushort> expectedIngredientIds = [1, 2, 8, 12, 15, 19];
-            List<ushort> expectedFreshIngredientIds = [2, 3, 4, 5, 6, 7, 8, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16];
-            (List<ushort> ingredientIds, List<ushort> freshIngredientIds) expected = new(expectedIngredientIds, expectedFreshIngredientIds);
+            List<URange> expectedFreshIngredientIds = [new(2, 8), new(6, 12), new(14, 16)];
+            (List<ushort> ingredientIds, List<URange> freshIngredientIds) expected = new(expectedIngredientIds, expectedFreshIngredientIds);
             string[] input =
                 [
                     "2-8",
@@ -131,77 +155,6 @@ namespace AdventOfCode.Test.Year2025
         }
 
         [Test]
-        public void BuildFreshIngredientDatabase_NullInput_ThrowsArgumentNullException()
-        {
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => BuildFreshIngredientDatabase(null!));
-        }
-
-        [Test]
-        public void BuildFreshIngredientDatabase_EmptyInput_ReturnsEmpty()
-        {
-            // Act
-            var result = BuildFreshIngredientDatabase([]);
-
-            // Assert
-            Assert.That(result, Is.Empty);
-        }
-
-        [Test]
-        public void BuildFreshIngredientDatabase_WithMixedNumbers_ReturnsOrderedDictionary()
-        {
-            // Arrange
-            var expected = new Dictionary<ushort, Ingredient>
-            {
-                { 2, new(2, IngredientState.Fresh, false) },
-                { 3, new(3, IngredientState.Fresh, false) },
-                { 5, new(5, IngredientState.Fresh, false) },
-                { 6, new(6, IngredientState.Fresh, false) },
-                { 7, new(7, IngredientState.Fresh, false) },
-                { 12, new(12, IngredientState.Fresh, false) },
-                { 19, new(19, IngredientState.Fresh, false) },
-            };
-            List<ushort> input = [12, 6, 19, 2, 5, 3, 7];
-
-            // Act
-            var result = BuildFreshIngredientDatabase(input);
-
-            // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(expected.Count));
-                Assert.That(result, Is.EquivalentTo(expected));
-            });
-        }
-
-        [Test]
-        public void BuildFreshIngredientDatabase_WithDuplicateMixedNumbers_ReturnsDictionaryWithoutDuplicates()
-        {
-            // Arrange
-            var expected = new Dictionary<ushort, Ingredient>
-            {
-                { 2, new(2, IngredientState.Fresh, false) },
-                { 3, new(3, IngredientState.Fresh, true) },
-                { 5, new(5, IngredientState.Fresh, false) },
-                { 6, new(6, IngredientState.Fresh, true) },
-                { 7, new(7, IngredientState.Fresh, false) },
-                { 12, new(12, IngredientState.Fresh, false) },
-                { 19, new(19, IngredientState.Fresh, false) },
-            };
-            List<ushort> input = [12, 6, 19, 2, 5, 3, 7, 6, 3];
-
-            // Act
-            var result = BuildFreshIngredientDatabase(input);
-
-            // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(expected.Count));
-                Assert.That(result, Is.EquivalentTo(expected));
-            });
-        }
-
-        [Test]
         public void GetFreshIngredientCountFromAvailableIngredientIds_NullIngredientIdsInput_ThrowsArgumentNullException()
         {
             // Act & Assert
@@ -226,14 +179,14 @@ namespace AdventOfCode.Test.Year2025
         public void GetFreshIngredientCountFromAvailableIngredientIds_EmptyIngredientIdsList_ReturnsZero()
         {
             // Arrange
-            List<ushort> ingredientIds = [];
-            Dictionary<ushort, Ingredient> ingredientDatabase = new()
-            {
-                { 2, new(2, IngredientState.Fresh, false) },
-                { 7, new(7, IngredientState.Fresh, true) },
-                { 12, new(12, IngredientState.Fresh, false) },
-                { 22, new(22, IngredientState.Fresh, false) },
-            };
+            List<ulong> ingredientIds = [];
+            List<URange> ingredientDatabase =
+            [
+                new(6,10),
+                new(8,12),
+                new(14,15),
+                new(16,20),
+            ];
 
             // Act
             var result = GetFreshIngredientCountFromAvailableIngredientIds(ingredientIds, ingredientDatabase);
@@ -246,8 +199,8 @@ namespace AdventOfCode.Test.Year2025
         public void GetFreshIngredientCountFromAvailableIngredientIds_EmptyIngredientDatabase_ReturnsZero()
         {
             // Arrange
-            List<ushort> ingredientIds = [2, 6, 8, 12, 16];
-            Dictionary<ushort, Ingredient> ingredientDatabase = [];
+            List<ulong> ingredientIds = [2, 6, 8, 12, 16];
+            List<URange> ingredientDatabase = [];
 
             // Act
             var result = GetFreshIngredientCountFromAvailableIngredientIds(ingredientIds, ingredientDatabase);
@@ -260,20 +213,125 @@ namespace AdventOfCode.Test.Year2025
         public void GetFreshIngredientCountFromAvailableIngredientIds_ValidInput_ReturnsCorrectResult()
         {
             // Arrange
-            List<ushort> ingredientIds = [2, 6, 8, 12, 16];
-            Dictionary<ushort, Ingredient> ingredientDatabase = new()
-            {
-                { 2, new(2, IngredientState.Fresh, false) },
-                { 7, new(7, IngredientState.Fresh, true) },
-                { 12, new(12, IngredientState.Fresh, false) },
-                { 22, new(22, IngredientState.Fresh, false) },
-            };
+            List<ulong> ingredientIds = [2, 6, 8, 11, 13, 16, 21];
+            List<URange> ingredientDatabase =
+            [
+                new(6,10),
+                new(8,12),
+                new(14,15),
+                new(16,20),
+            ];
 
             // Act
             var result = GetFreshIngredientCountFromAvailableIngredientIds(ingredientIds, ingredientDatabase);
 
             // Assert
-            Assert.That(result, Is.EqualTo(2u));
+            Assert.That(result, Is.EqualTo(4u));
+        }
+
+        [Test]
+        public void ExistsWithinRange_NullRange_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => ExistsWithinRange(null!, 5));
+        }
+
+        [Test]
+        public void ExistsWithinRange_NumberIsZero_ReturnsFalse()
+        {
+            // Arrange
+            URange range = new(6, 9);
+
+            // Act
+            var actual = ExistsWithinRange(range, 0);
+
+            // Assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public void ExistsWithinRange_NumberIsOutsideRange_ReturnsFalse()
+        {
+            // Arrange
+            URange range = new(6, 9);
+
+            // Act
+            var actual = ExistsWithinRange(range, 10);
+
+            // Assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public void ExistsWithinRange_NumberIsInsideRange_ReturnsTrue()
+        {
+            // Arrange
+            URange range = new(6, 9);
+
+            // Act
+            var actual = ExistsWithinRange(range, 7);
+
+            // Assert
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        public void ExistsWithinAnyRange_NumberZero_ReturnsFalse()
+        {
+            // Arrange
+            List<URange> ranges = [new(6, 9), new(6, 12), new(14, 18)];
+
+            // Act
+            var actual = ExistsWithinAnyRange(ranges, 0);
+
+            // Assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public void ExistsWithinAnyRange_RangeIsEmpty_ReturnsFalse()
+        {
+            // Arrange
+            List<URange> ranges = [];
+
+            // Act
+            var actual = ExistsWithinAnyRange(ranges, 0);
+
+            // Assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public void ExistsWithinAnyRange_RangeIsNull_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => ExistsWithinAnyRange(null!, 6));
+        }
+
+        [Test]
+        public void ExistsWithinAnyRange_NumberIsOutsideRanges_ReturnsFalse()
+        {
+            // Arrange
+            List<URange> ranges = [new(6, 9), new(6, 12), new(14, 18)];
+
+            // Act
+            var actual = ExistsWithinAnyRange(ranges, 20);
+
+            // Assert
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        public void ExistsWithinAnyRange_NumberIsWithinRanges_ReturnsTrue()
+        {
+            // Arrange
+            List<URange> ranges = [new(6, 9), new(6, 12), new(14, 18)];
+
+            // Act
+            var actual = ExistsWithinAnyRange(ranges, 17);
+
+            // Assert
+            Assert.That(actual, Is.True);
         }
     }
 }

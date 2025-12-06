@@ -26,14 +26,12 @@
 
             var (ingredientIds, freshIngredientIds) = BuildIngredientLists(input);
 
-            Dictionary<ushort, Ingredient> ingredientsDatabase = BuildFreshIngredientDatabase(freshIngredientIds);
-
-            var freshCount = GetFreshIngredientCountFromAvailableIngredientIds(ingredientIds, ingredientsDatabase);
+            var freshCount = GetFreshIngredientCountFromAvailableIngredientIds(ingredientIds, freshIngredientIds);
 
             return freshCount;
         }
 
-        internal static (List<ushort> ingredientIds, List<ushort> freshIngredientIds) BuildIngredientLists(string[] input)
+        internal static (List<ulong> ingredientIds, List<URange> freshIngredientIds) BuildIngredientLists(string[] input)
         {
             ArgumentNullException.ThrowIfNull(input);
 
@@ -43,8 +41,8 @@
             }
 
             var isRangeSection = true;
-            List<ushort> ingredientIds = [];
-            List<ushort> freshIngredientIds = [];
+            List<ulong> ingredientIds = [];
+            List<URange> freshIngredientIds = [];
 
             foreach (var line in input)
             {
@@ -55,11 +53,7 @@
                         isRangeSection = false;
                         continue;
                     }
-                    var range = GetRange(line);
-                    for (ushort i = range.Start; i <= range.End; i++)
-                    {
-                        freshIngredientIds.Add(i);
-                    }
+                    freshIngredientIds.Add(GetRange(line));
                 }
                 else
                 {
@@ -67,7 +61,7 @@
                     {
                         continue;
                     }
-                    var ingredientId = ushort.Parse(line);
+                    var ingredientId = ulong.Parse(line);
                     ingredientIds.Add(ingredientId);
                 }
             }
@@ -86,37 +80,13 @@
             {
                 throw new FormatException("Line is not in the correct format");
             }
-            var start = ushort.Parse(parts[0]);
-            var end = ushort.Parse(parts[1]);
+            var start = ulong.Parse(parts[0]);
+            var end = ulong.Parse(parts[1]);
 
             return new URange(start, end);
         }
 
-        internal static Dictionary<ushort, Ingredient> BuildFreshIngredientDatabase(List<ushort> freshIngredientIds)
-        {
-            ArgumentNullException.ThrowIfNull(freshIngredientIds, nameof(freshIngredientIds));
-
-            if (freshIngredientIds.Count == 0)
-            {
-                return [];
-            }
-
-            Dictionary<ushort, Ingredient> ingredientsDatabase = [];
-            foreach (var fresh in freshIngredientIds.OrderBy(x => x))
-            {
-                if (ingredientsDatabase.ContainsKey(fresh))
-                {
-                    ingredientsDatabase[fresh] = new Ingredient(fresh, IngredientState.Fresh, true);
-                    continue;
-                }
-
-                ingredientsDatabase[fresh] = new Ingredient(fresh, IngredientState.Fresh, false);
-            }
-
-            return ingredientsDatabase;
-        }
-
-        internal static uint GetFreshIngredientCountFromAvailableIngredientIds(List<ushort> ingredientIds, Dictionary<ushort, Ingredient> ingredientsDatabase)
+        internal static uint GetFreshIngredientCountFromAvailableIngredientIds(List<ulong> ingredientIds, List<URange> ingredientsDatabase)
         {
             ArgumentNullException.ThrowIfNull(ingredientIds);
             ArgumentNullException.ThrowIfNull(ingredientsDatabase);
@@ -129,7 +99,7 @@
             var freshCount = 0u;
             foreach (var ingredientId in ingredientIds.OrderBy(x => x))
             {
-                if (ingredientsDatabase.ContainsKey(ingredientId))
+                if (ExistsWithinAnyRange(ingredientsDatabase, ingredientId))
                 {
                     freshCount++;
                 }
@@ -138,9 +108,46 @@
             return freshCount;
         }
 
-        internal record URange(ushort Start, ushort End);
+        internal static bool ExistsWithinAnyRange(List<URange> ranges, ulong number)
+        {
+            ArgumentNullException.ThrowIfNull(ranges);
 
-        internal record Ingredient(uint Id, IngredientState IngredientState, bool? Overlaps);
+            if (number == 0)
+            {
+                return false;
+            }
+
+            if (ranges.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (var range in ranges)
+            {
+                if (ExistsWithinRange(range, number))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        internal static bool ExistsWithinRange(URange range, ulong number)
+        {
+            ArgumentNullException.ThrowIfNull(range);
+
+            if (number == 0)
+            {
+                return false;
+            }
+
+            return number >= range.Start && number <= range.End;
+        }
+
+        internal record URange(ulong Start, ulong End);
+
+        internal record Ingredient(ulong Id, IngredientState IngredientState, bool? Overlaps);
 
         internal enum IngredientState
         {
