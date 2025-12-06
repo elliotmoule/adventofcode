@@ -1,11 +1,13 @@
-﻿namespace AdventOfCode.Business.Year2025
+﻿using System.Collections.ObjectModel;
+
+namespace AdventOfCode.Business.Year2025
 {
     internal class Day6 : IAdventDay
     {
         public void ExecutePart1()
         {
             var day6Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day6_Input.txt"));
-            var result = CalculateTotalOfAllAnswers(day6Input);
+            var result = CalculateTotalOfAllAnswers(day6Input, false);
 
             Console.WriteLine($"\r\nThe grand total found by adding all answers together is: '{result}'.\r\n");
         }
@@ -13,36 +15,57 @@
         public void ExecutePart2()
         {
             var day6Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day6_Input.txt"));
-            var result = $"{day6Input}";
+            var result = CalculateTotalOfAllAnswers(day6Input, true);
 
             Console.WriteLine($"\r\nThe grand total found by adding all answers together is: '{result}'.\r\n");
         }
 
-        internal static long CalculateTotalOfAllAnswers(string[] input)
+        internal static long CalculateTotalOfAllAnswers(string[] input, bool rightToLeft)
         {
             ArgumentNullException.ThrowIfNull(input);
 
-            var operations = RetrieveColumnOperations(input);
-
-            var columns = RetrieveColumns(operations.Count, input);
-
-            if (operations.Count != columns.Count)
-            {
-                throw new FormatException("The provided operations count does not equal the column values count.");
-            }
+            var operators = RetrieveColumnOperators(input, rightToLeft);
 
             long sumOfAllColumns = 0;
-            for (int i = 0; i < operations.Count; i++)
+
+            if (rightToLeft)
             {
-                var column = columns[(uint)i];
-                var operation = operations[i];
-                sumOfAllColumns += SumOfColumnValues(operation, column);
+                var inputWithoutOperators = input.Take(input.Length - 1).ToArray();
+                var columns = RetrieveColumnsRightToLeft(inputWithoutOperators);
+
+                if (operators.Count != columns.Count)
+                {
+                    throw new FormatException("The provided operations count does not equal the column values count.");
+                }
+
+                for (int i = 0; i < operators.Count; i++)
+                {
+                    var column = columns[i];
+                    var operation = operators[i];
+                    sumOfAllColumns += CalculateByColumns(operation, column);
+                }
+            }
+            else
+            {
+                Dictionary<uint, List<long>> columns = RetrieveColumns(operators.Count, input);
+
+                if (operators.Count != columns.Count)
+                {
+                    throw new FormatException("The provided operations count does not equal the column values count.");
+                }
+
+                for (int i = 0; i < operators.Count; i++)
+                {
+                    var column = columns[(uint)i];
+                    var operation = operators[i];
+                    sumOfAllColumns += SumOfColumnValues(operation, column);
+                }
             }
 
             return sumOfAllColumns;
         }
 
-        internal static List<char> RetrieveColumnOperations(string[] input)
+        internal static List<char> RetrieveColumnOperators(string[] input, bool reverse = false)
         {
             ArgumentNullException.ThrowIfNull(input);
 
@@ -54,7 +77,7 @@
             var lastRow = input.Last();
             var split = lastRow.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-            var operations = new List<char>();
+            var operations = new Collection<char>();
             for (int i = 0; i < split.Length; i++)
             {
                 var character = split[i];
@@ -65,7 +88,7 @@
                 operations.Add(split[i][0]);
             }
 
-            return operations;
+            return [.. (reverse ? operations.Reverse() : operations)];
         }
 
         internal static Dictionary<uint, List<long>> RetrieveColumns(int operations, string[] input)
@@ -184,6 +207,133 @@
                 '-' => value1 - value2,
                 _ => throw new ArgumentException("Provided character is not a mathematic operation"),
             };
+        }
+
+        internal static long CalculateByColumns(char operatorSymbol, List<string> column)
+        {
+            ArgumentNullException.ThrowIfNull(column);
+
+            if (column.Count == 0)
+            {
+                return 0;
+            }
+
+            int maxLength = column.Max(s => s.Length);  // Number of columns.
+
+            var firstColumn = true;
+            long result = 0;
+
+            for (int col = maxLength - 1; col >= 0; col--)
+            {
+                string columnDigits = string.Empty;
+
+                // Cephalopods read right to left, most significant at the top.
+                for (int row = 0; row < column.Count; row++)
+                {
+                    if (col < column[row].Length)
+                    {
+                        char digitChar = column[row][col];
+
+                        if (digitChar == ' ')
+                        {
+                            continue;
+                        }
+
+                        if (!char.IsDigit(digitChar))
+                        {
+                            throw new ArgumentException($"Invalid character '{digitChar}' in input");
+                        }
+
+                        columnDigits += digitChar;
+                    }
+                }
+
+                // Check the column has any digits, form a number and apply the operator
+                if (columnDigits.Length > 0)
+                {
+                    long columnNumber = long.Parse(columnDigits);
+
+                    if (firstColumn)
+                    {
+                        result = columnNumber; // First column (rightmost with data)
+                        firstColumn = false;
+                    }
+                    else
+                    {
+                        result = CalculateByOperation(operatorSymbol, result, columnNumber);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        internal static List<List<string>> RetrieveColumnsRightToLeft(string[] rows)
+        {
+            ArgumentNullException.ThrowIfNull(rows);
+
+            if (rows.Length == 0)
+            {
+                throw new ArgumentException("Column blocks cannot be extracted from empty rows.");
+            }
+
+            int maxLength = rows.Max(r => r.Length);
+
+            var columns = new List<List<string>>();
+            var currentColumn = new List<string>();
+
+            for (int charIndex = maxLength - 1; charIndex >= 0; charIndex--)
+            {
+                bool allSpaces = true;
+                for (int rowIndex = 0; rowIndex < rows.Length; rowIndex++)
+                {
+                    if (rows[rowIndex][charIndex] != ' ')
+                    {
+                        allSpaces = false;
+                        break;
+                    }
+                }
+
+                if (allSpaces && currentColumn.Count > 0)
+                {
+                    for (int i = 0; i < currentColumn.Count; i++)
+                    {
+                        currentColumn[i] = new string([.. currentColumn[i].Reverse()]); // Right to left.
+                    }
+
+                    columns.Add([.. currentColumn]);
+                    currentColumn.Clear();
+                }
+                else if (!allSpaces)
+                {
+                    // This character belongs to the current column
+                    if (currentColumn.Count == 0)
+                    {
+                        for (int i = 0; i < rows.Length; i++)
+                        {
+                            currentColumn.Add("");  // Initialising each row now.
+                        }
+                    }
+
+                    // Add this character to each row's string in the current column
+                    for (int rowIndex = 0; rowIndex < rows.Length; rowIndex++)
+                    {
+                        currentColumn[rowIndex] += rows[rowIndex][charIndex];
+                    }
+                }
+            }
+
+            // Need to do this separately, as we don't have a separator on the far left.
+            if (currentColumn.Count > 0)
+            {
+                for (int i = 0; i < currentColumn.Count; i++)
+                {
+                    currentColumn[i] = new string([.. currentColumn[i].Reverse()]);
+                }
+                columns.Add([.. currentColumn]);
+            }
+
+            return columns;
         }
     }
 }

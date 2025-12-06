@@ -8,7 +8,7 @@ namespace AdventOfCode.Test.Year2025
         public void CalculateTotalOfAllAnswers_NullInput_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => CalculateTotalOfAllAnswers(null!));
+            Assert.Throws<ArgumentNullException>(() => CalculateTotalOfAllAnswers(null!, false));
         }
 
         [Test]
@@ -25,7 +25,7 @@ namespace AdventOfCode.Test.Year2025
             ];
 
             // Act & Assert
-            Assert.Throws<FormatException>(() => CalculateTotalOfAllAnswers(input));
+            Assert.Throws<FormatException>(() => CalculateTotalOfAllAnswers(input, false));
         }
 
         [Test]
@@ -42,7 +42,7 @@ namespace AdventOfCode.Test.Year2025
             ];
 
             // Act & Assert
-            Assert.Throws<FormatException>(() => CalculateTotalOfAllAnswers(input));
+            Assert.Throws<FormatException>(() => CalculateTotalOfAllAnswers(input, false));
         }
 
         [Test]
@@ -72,19 +72,28 @@ namespace AdventOfCode.Test.Year2025
             //var sum = 1491;
 
             // Act
-            var actual = CalculateTotalOfAllAnswers(input);
+            var actual = CalculateTotalOfAllAnswers(input, false);
 
             // Assert
             Assert.That(actual, Is.EqualTo(1491));
         }
 
         [Test]
-        public void CalculateTotalOfAllAnswers_ValidExampleInput_ReturnsCorrectSum()
+        public void CalculateTotalOfAllAnswers_ExampleInput_ReturnsCorrectSum()
         {
             var day6Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Example", "Day6_Input.txt"));
-            var result = CalculateTotalOfAllAnswers(day6Input);
+            var result = CalculateTotalOfAllAnswers(day6Input, false);
 
             Assert.That(result, Is.EqualTo(4277556));
+        }
+
+        [Test]
+        public void CalculateTotalOfAllAnswers_RightToLeftExampleInput_ReturnsCorrectSum()
+        {
+            var day6Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Example", "Day6_Input.txt"));
+            var result = CalculateTotalOfAllAnswers(day6Input, true);
+
+            Assert.That(result, Is.EqualTo(3263827));
         }
 
         [Test]
@@ -343,21 +352,21 @@ namespace AdventOfCode.Test.Year2025
         }
 
         [Test]
-        public void RetrieveColumnOperations_NullInput_ThrowsArgumentNullException()
+        public void RetrieveColumnOperators_NullInput_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => RetrieveColumnOperations(null!));
+            Assert.Throws<ArgumentNullException>(() => RetrieveColumnOperators(null!));
         }
 
         [Test]
-        public void RetrieveColumnOperations_EmptyInput_ThrowsArgumentException()
+        public void RetrieveColumnOperators_EmptyInput_ThrowsArgumentException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => RetrieveColumnOperations([]));
+            Assert.Throws<ArgumentException>(() => RetrieveColumnOperators([]));
         }
 
         [Test]
-        public void RetrieveColumnOperations_ValidInputWithOperationsLine_ReturnsAllOperations()
+        public void RetrieveColumnOperators_ValidInputWithOperationsLine_ReturnsAllOperations()
         {
             // Arrange
             Dictionary<uint, List<long>> expectedColumns = new()
@@ -377,7 +386,7 @@ namespace AdventOfCode.Test.Year2025
             ];
 
             // Act
-            var actual = RetrieveColumnOperations(input);
+            var actual = RetrieveColumnOperators(input);
 
             // Assert
             Assert.Multiple(() =>
@@ -388,6 +397,114 @@ namespace AdventOfCode.Test.Year2025
                 Assert.That(actual[2], Is.EqualTo('-'));
                 Assert.That(actual[3], Is.EqualTo('+'));
             });
+        }
+
+        [Test]
+        public void RetrieveColumnsRightToLeft_NullInput_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => RetrieveColumnsRightToLeft(null!));
+        }
+
+        [Test]
+        public void RetrieveColumnsRightToLeft_EmptyInput_ThrowsArgumentException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => RetrieveColumnsRightToLeft([]));
+        }
+
+        [Test]
+        public void RetrieveColumnsRightToLeft_ValidInput_ReturnsCorrectColumnLists()
+        {
+            // Arrange
+            var expected = new List<List<string>>
+            {
+                new()
+                {
+                    "64 ", "23 ", "314",
+                },
+                new()
+                {
+                    " 51 ", "387", "245",
+                },
+                new()
+                {
+                    "328", "64 ", "98 ",
+                },
+                new()
+                {
+                    "123", " 45", "  6",
+                },
+            };
+            string[] input =
+            [
+                "123 328  51 64 ",
+                " 45 64  387 23 ",
+                "  6 98  215 314"
+            ];
+
+            // Act
+            var actual = RetrieveColumnsRightToLeft(input);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(actual, Has.Count.EqualTo(4));
+                Assert.That(actual[0], Has.Count.EqualTo(expected[0].Count));
+                Assert.That(actual[0][0], Is.EqualTo(expected[0][0]));
+                Assert.That(actual[2][2], Is.EqualTo(expected[2][2]));
+            });
+        }
+
+        [Test]
+        public void CalculateByColumns_NullColumn_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => CalculateByColumns('+', null!));
+        }
+
+        [Test]
+        public void CalculateByColumns_EmptyColumn_ReturnsZero()
+        {
+            // Act
+            var result = CalculateByColumns('+', []);
+
+            // Assert
+            Assert.That(result, Is.Zero);
+        }
+
+        [Test]
+        public void CalculateByColumns_ValidInput_ReturnsExpectedSum()
+        {
+            // Arrange
+            List<string> input =
+            [
+                "15 ", "12 ", "564",
+            ];
+            // 4 + 526 + 115
+
+            // Act
+            var actual = CalculateByColumns('+', input);
+
+            // Assert
+            Assert.That(actual, Is.EqualTo(645));
+        }
+
+        [Test]
+        public void CalculateByColumns_ValidInputDifferingOffsets_ReturnsExpectedSum()
+        {
+            // Arrange
+            List<string> input =
+            [
+                "  5", " 12", "564",
+            ];
+            // 524 + 16 + 5
+
+            // Act
+            var actual = CalculateByColumns('+', input);
+
+            // Assert
+            Assert.That(actual, Is.EqualTo(545));
         }
     }
 }
