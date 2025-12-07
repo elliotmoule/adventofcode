@@ -18,7 +18,66 @@
 
         public void ExecutePart2()
         {
-            throw new NotImplementedException();
+            var day7Input = File.ReadAllLines(Path.Combine(_root, "Day7_Input.txt"));
+            var result = CountPaths(day7Input);
+
+            Console.WriteLine($"\r\nThe tachyon particle would end up on '{result}' different timelines.\r\n");
+        }
+
+        internal static long CountPaths(string[] grid)
+        {
+            var (Row, Col) = FindStartPosition(grid) ?? throw new ArgumentException("No starting position 'S' found in grid");
+
+            var cache = new Dictionary<Position, long>();
+            return CountPathsWithPositionCaching(grid, Row, Col, 1, 0, cache);
+        }
+
+        internal static long CountPathsWithPositionCaching(
+            string[] grid,
+            int row,
+            int col,
+            int dirRow,
+            int dirCol,
+            Dictionary<Position, long> cache)
+        {
+            ArgumentNullException.ThrowIfNull(grid);
+            ArgumentNullException.ThrowIfNull(cache);
+
+            if (grid.Length == 0)
+            {
+                return 0;
+            }
+
+            int newRow = row + dirRow;
+            int newCol = col + dirCol;
+
+            if (!IsInBounds(grid, newRow, newCol))
+            {
+                return 1;
+            }
+
+            Position position = new(newRow, newCol, dirRow, dirCol);
+            if (cache.TryGetValue(position, out long value))
+            {
+                return value;
+            }
+
+            char cell = grid[newRow][newCol];
+            long pathCount;
+
+            if (cell == '^')
+            {
+                long leftPaths = CountPathsWithPositionCaching(grid, newRow, newCol, 1, -1, cache);
+                long rightPaths = CountPathsWithPositionCaching(grid, newRow, newCol, 1, 1, cache);
+                pathCount = leftPaths + rightPaths;
+            }
+            else
+            {
+                pathCount = CountPathsWithPositionCaching(grid, newRow, newCol, 1, 0, cache);
+            }
+
+            cache[position] = pathCount;
+            return pathCount;
         }
 
         internal static int CountSplits(string[] grid)
@@ -133,6 +192,7 @@
         }
 
         internal record Beam(int Row, int Col, int DirRow, int DirCol);
+        internal record Position(int Row, int Col, int DirRow, int DirCol); // Effectively the same things as the beam, but beam doesn't apply to splitters and empty positions, too.
     }
 }
 

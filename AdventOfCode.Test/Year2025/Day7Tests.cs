@@ -5,6 +5,40 @@ namespace AdventOfCode.Test.Year2025
     internal class Day7Tests
     {
         [Test]
+        public void CountPaths_WithSimpleGrid_Counts4Paths()
+        {
+            // Arrange
+            var simplePathGrid = new[]
+            {
+                ".......S.......",
+                ".......|.......",
+                "......|^|......",
+                "...............",
+                "......^.^......",
+                "..............."
+            };
+
+            // Act
+            var pathCount = CountPaths(simplePathGrid);
+
+            // Assert
+            Assert.That(pathCount, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void CountPaths_WithExampleGrid_Counts40Paths()
+        {
+            // Arrange
+            var input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Example", "Day7_Input.txt"));
+
+            // Act
+            var pathCount = CountPaths(input);
+
+            // Assert
+            Assert.That(pathCount, Is.EqualTo(40));
+        }
+
+        [Test]
         public void CountCaretCharacters_NullInput_ThrowsArgumentNullException()
         {
             // Act & Assert
@@ -66,11 +100,12 @@ namespace AdventOfCode.Test.Year2025
         public void FindStartPosition_WithNoStart_ReturnsNull()
         {
             // Arrange
-            var gridWithoutStart = new[] {
-            ".......",
-            "...^...",
-            "......."
-        };
+            var gridWithoutStart = new[]
+            {
+                ".......",
+                "...^...",
+                "......."
+            };
 
             // Act
             var result = FindStartPosition(gridWithoutStart);
@@ -288,6 +323,54 @@ namespace AdventOfCode.Test.Year2025
             // Act & Assert
             Assert.Throws<ArgumentException>(() => CountSplits(gridWithoutStart));
         }
-    }
 
+        [Test]
+        public void CountPathsWithPositionCaching_NullCacheInput_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => CountPathsWithPositionCaching([], 0, 0, 1, 0, null!));
+        }
+
+        [Test]
+        public void CountPathsWithPositionCaching_NullGridInput_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => CountPathsWithPositionCaching(null!, 0, 0, 1, 0, []));
+        }
+
+        [Test]
+        public void CountPathsWithPositionCaching_EmptyGridInput_ReturnsZero()
+        {
+            // Act
+            var result = CountPathsWithPositionCaching([], 0, 0, 1, 0, []);
+
+            // Assert
+            Assert.That(result, Is.Zero);
+        }
+
+        [Test]
+        public void CountPathsWithPositionCaching_ValidGridInput_ReturnsExpectedResult()
+        {
+            // Arrange
+            var simplePathGrid = new[]
+            {
+                ".......S.......",
+                ".......|.......",
+                "......|^|......",
+                "...............",
+                "......^.^......",
+                "...............",
+                ".........^.....",
+                "...............",
+                ".....^.........",
+                "...............",
+            };
+
+            // Act
+            var pathCount = CountPathsWithPositionCaching(simplePathGrid, 0, 7, 1, 0, []);
+
+            // Assert
+            Assert.That(pathCount, Is.EqualTo(6));
+        }
+    }
 }
