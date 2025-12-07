@@ -2,9 +2,15 @@
 {
     internal class Day2 : IAdventDay
     {
+        string _root = string.Empty;
+        public void SetRoot(string path)
+        {
+            _root = path;
+        }
+
         public void ExecutePart1()
         {
-            var day2Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Actual", "Day2_Input.txt"));
+            var day2Input = File.ReadAllText(Path.Combine(_root, "Day2_Input.txt"));
             var result = SumOfRepeatedSequenceProductsInRanges(
                     CommaDelimitedList(day2Input)
                     .Select(ParseProductRange),
@@ -16,7 +22,7 @@
 
         public void ExecutePart2()
         {
-            var day2Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Actual", "Day2_Input.txt"));
+            var day2Input = File.ReadAllText(Path.Combine(_root, "Day2_Input.txt"));
             var result = SumOfRepeatedSequenceProductsInRanges(
                     CommaDelimitedList(day2Input)
                     .Select(ParseProductRange),

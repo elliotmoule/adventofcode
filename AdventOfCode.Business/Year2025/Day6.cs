@@ -4,9 +4,15 @@ namespace AdventOfCode.Business.Year2025
 {
     internal class Day6 : IAdventDay
     {
+        string _root = string.Empty;
+        public void SetRoot(string path)
+        {
+            _root = path;
+        }
+
         public void ExecutePart1()
         {
-            var day6Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day6_Input.txt"));
+            var day6Input = File.ReadAllLines(Path.Combine(_root, "Day6_Input.txt"));
             var result = CalculateTotalOfAllAnswers(day6Input, false);
 
             Console.WriteLine($"\r\nThe grand total found by adding all answers together is: '{result}'.\r\n");
@@ -14,7 +20,7 @@ namespace AdventOfCode.Business.Year2025
 
         public void ExecutePart2()
         {
-            var day6Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day6_Input.txt"));
+            var day6Input = File.ReadAllLines(Path.Combine(_root, "Day6_Input.txt"));
             var result = CalculateTotalOfAllAnswers(day6Input, true);
 
             Console.WriteLine($"\r\nThe grand total found by adding all answers together is: '{result}'.\r\n");

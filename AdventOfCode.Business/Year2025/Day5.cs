@@ -2,9 +2,15 @@
 {
     internal class Day5 : IAdventDay
     {
+        string _root = string.Empty;
+        public void SetRoot(string path)
+        {
+            _root = path;
+        }
+
         public void ExecutePart1()
         {
-            var day5Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day5_Input.txt"));
+            var day5Input = File.ReadAllLines(Path.Combine(_root, "Day5_Input.txt"));
             var result = CalculateHowManyIngredientsAreFresh(day5Input);
 
             Console.WriteLine($"\r\nThere are {result} fresh available ingredient IDs.\r\n");
@@ -12,7 +18,7 @@
 
         public void ExecutePart2()
         {
-            var day5Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day5_Input.txt"));
+            var day5Input = File.ReadAllLines(Path.Combine(_root, "Day5_Input.txt"));
             var result = CalculateHowManyFreshIdsWithinFreshRanges(day5Input);
 
             Console.WriteLine($"\r\nThere are {result} total fresh ingredient IDs.\r\n");

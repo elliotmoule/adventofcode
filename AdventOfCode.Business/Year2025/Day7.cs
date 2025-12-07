@@ -2,9 +2,15 @@
 {
     internal class Day7 : IAdventDay
     {
+        string _root = string.Empty;
+        public void SetRoot(string path)
+        {
+            _root = path;
+        }
+
         public void ExecutePart1()
         {
-            var day7Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day7_Input.txt"));
+            var day7Input = File.ReadAllLines(Path.Combine(_root, "Day7_Input.txt"));
             var result = CountSplits(day7Input);
 
             Console.WriteLine($"\r\nThe beam will be split '{result}' times.\r\n");

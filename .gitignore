@@ -418,3 +418,4 @@ FodyWeavers.xsd
 *.msp
 
 /AdventOfCode.Business/*/Resources
+/AdventOfCode.Terminal/Properties/launchSettings.json

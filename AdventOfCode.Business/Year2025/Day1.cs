@@ -5,9 +5,15 @@
         const int maxPosition = 99;
         const int startingPosition = 50;
 
+        string _root = string.Empty;
+        public void SetRoot(string path)
+        {
+            _root = path;
+        }
+
         public void ExecutePart1()
         {
-            var day1Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day1_Input.txt"));
+            var day1Input = File.ReadAllLines(Path.Combine(_root, "Day1_Input.txt"));
             var result = CalculateNumberOfTimesDialIsAt0(day1Input);
 
             Console.WriteLine($"\r\nThe dial was at position 0 a total of {result} times.\r\n");
@@ -15,7 +21,7 @@
 
         public void ExecutePart2()
         {
-            var day1Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day1_Input.txt"));
+            var day1Input = File.ReadAllLines(Path.Combine(_root, "Day1_Input.txt"));
             var result = CalculateNumberOfTimesDialPasses0(day1Input);
 
             Console.WriteLine($"\r\nThe dial passed position 0 a total of {result} times.\r\n");

@@ -6,6 +6,7 @@ namespace AdventOfCode.Terminal
     internal class Program
     {
         public static string NewLine = Environment.NewLine;
+        static string _root = string.Empty;
 
         static void Main(string[] args)
         {
@@ -20,15 +21,41 @@ namespace AdventOfCode.Terminal
                 .Select(c => c.Replace("Day", "Day "))
                 .OrderBy(c => c)];
 
-            MainCore(availableYears);
+            MainCore(args, availableYears);
         }
 
-        static void MainCore(Dictionary<string, List<string>> availableYears)
+        static void MainCore(string[] args, Dictionary<string, List<string>> availableYears)
         {
             Console.ForegroundColor = ConsoleColor.White;
             while (true)
             {
-                Output.WriteMultiNewLine("---- Advent of Code ----");
+                Output.SetColorTemporarily(ConsoleColor.Cyan, () =>
+                {
+                    Output.WriteMultiNewLine("---- Advent of Code ----");
+                });
+
+                if (args.Length > 0)
+                {
+                    var possibleRoot = args[0];
+                    Output.WriteImportant($"Given Root: '{possibleRoot}'");
+                    if (Directory.Exists(possibleRoot))
+                    {
+                        var files = Directory.GetFiles(possibleRoot, "Day*_Input.txt");
+                        if (files.Length == 0)
+                        {
+                            Output.WriteError($"No puzzle input files found in provided root: '{possibleRoot}'.\r\n\r\nInput files must be in the format: 'Day*_Input.txt' (where '*' is an available number).");
+                            return;
+                        }
+
+                        Output.WriteImportant($"Setting directory root to: '{possibleRoot}'");
+                        _root = possibleRoot;
+                    }
+                    else
+                    {
+                        Output.WriteError($"Provided Root does not exist: '{possibleRoot}'\r\nExitting.");
+                        return;
+                    }
+                }
 
                 var (selectedYear, availableDays) = SelectYear(availableYears);
 
@@ -36,6 +63,8 @@ namespace AdventOfCode.Terminal
                 {
                     return;
                 }
+
+                SetRoot(selectedYear);
 
                 if (!availableDays.Contains("Exit"))
                 {
@@ -62,6 +91,8 @@ namespace AdventOfCode.Terminal
 
                 Action? execute;
 
+                adventDay.SetRoot(_root);
+
                 if (selectedPart == 1)
                 {
                     execute = adventDay.ExecutePart1;
@@ -78,6 +109,14 @@ namespace AdventOfCode.Terminal
                 {
                     break;
                 }
+            }
+        }
+
+        static void SetRoot(string selectedYear)
+        {
+            if (!Directory.Exists(_root))
+            {
+                _root = Path.Combine($"Year{selectedYear}", "Resources", "Actual");
             }
         }
 

@@ -2,9 +2,15 @@
 {
     internal class Day4 : IAdventDay
     {
+        string _root = string.Empty;
+        public void SetRoot(string path)
+        {
+            _root = path;
+        }
+
         public void ExecutePart1()
         {
-            var day4Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day4_Input.txt"));
+            var day4Input = File.ReadAllLines(Path.Combine(_root, "Day4_Input.txt"));
             var result = CalculateHowManyPaperRollsAreAccessible(day4Input, 1, 4);
 
             Console.WriteLine($"\r\nCan access {result} rolls of paper with the forklift.\r\n");
@@ -12,7 +18,7 @@
 
         public void ExecutePart2()
         {
-            var day4Input = File.ReadAllLines(Path.Combine("Year2025", "Resources", "Actual", "Day4_Input.txt"));
+            var day4Input = File.ReadAllLines(Path.Combine(_root, "Day4_Input.txt"));
             var result = CalculateHowManyPaperRollsCanBeRemoved(day4Input, 1, 4);
 
             Console.WriteLine($"\r\nCan remove {result} rolls of paper with the forklift.\r\n");

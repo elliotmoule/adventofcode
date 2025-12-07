@@ -4,5 +4,6 @@
     {
         void ExecutePart1();
         void ExecutePart2();
+        void SetRoot(string path);
     }
 }

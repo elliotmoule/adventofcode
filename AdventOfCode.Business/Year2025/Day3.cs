@@ -2,9 +2,15 @@
 {
     internal class Day3 : IAdventDay
     {
+        string _root = string.Empty;
+        public void SetRoot(string path)
+        {
+            _root = path;
+        }
+
         public void ExecutePart1()
         {
-            var day3Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Actual", "Day3_Input.txt"));
+            var day3Input = File.ReadAllText(Path.Combine(_root, "Day3_Input.txt"));
             var result = SumOfProducedJoltage(day3Input, 2);
 
             Console.WriteLine($"\r\nThe total output joltage is {result}.\r\n");
@@ -12,7 +18,7 @@
 
         public void ExecutePart2()
         {
-            var day3Input = File.ReadAllText(Path.Combine("Year2025", "Resources", "Actual", "Day3_Input.txt"));
+            var day3Input = File.ReadAllText(Path.Combine(_root, "Day3_Input.txt"));
             var result = SumOfProducedJoltage(day3Input, 12);
 
             Console.WriteLine($"\r\nThe total output joltage is {result}.\r\n");
