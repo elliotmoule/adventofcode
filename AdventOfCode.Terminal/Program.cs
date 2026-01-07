@@ -18,14 +18,19 @@ namespace AdventOfCode.Terminal
 
             var dayClasses = GetAdventDayClasses();
             availableYears["2025"] = [.. dayClasses
-                .Select(c => c.Replace("Day", "Day "))
-                .OrderBy(c => c)];
+                .OrderBy(d => d.Number)
+                .Select(s => s.ClassName)];
 
             MainCore(args, availableYears);
         }
 
         static void MainCore(string[] args, Dictionary<string, List<string>> availableYears)
         {
+            if (args == null || availableYears == null || availableYears.Count == 0)
+            {
+                return;
+            }
+
             Console.ForegroundColor = ConsoleColor.White;
             while (true)
             {
@@ -114,6 +119,11 @@ namespace AdventOfCode.Terminal
 
         static void SetRoot(string selectedYear)
         {
+            if (string.IsNullOrWhiteSpace(selectedYear))
+            {
+                return;
+            }
+
             if (!Directory.Exists(_root))
             {
                 _root = Path.Combine($"Year{selectedYear}", "Resources", "Actual");
@@ -122,57 +132,70 @@ namespace AdventOfCode.Terminal
 
         static KeyValuePair<string, List<string>> SelectYear(Dictionary<string, List<string>> availableYears)
         {
+            if (availableYears == null || availableYears.Count == 0)
+            {
+                return new KeyValuePair<string, List<string>>(string.Empty, []);
+            }
+
             while (true)
             {
                 var optionsDictionary = new Dictionary<int, string>();
-                uint counter = 0;
+                uint counter = 1;
                 var message = $"Select Year. Available options:{NewLine}";
 
                 foreach (var year in availableYears.Keys.OrderByDescending(x => x))
                 {
-                    counter++;
                     optionsDictionary.Add((int)counter, year);
                     message += $"{NewLine}{counter}) {year}";
+                    counter++;
                 }
 
                 message = $"{NewLine}{message}{NewLine}{NewLine}Enter year selection";
-                var selectedYearNumber = Output.QuestionNumberInput(message, 1, counter);
+                var selectedYearNumber = Output.QuestionNumberInput(message, 1, counter - 1);
+
+                if (selectedYearNumber == 1)
+                {
+                    return new KeyValuePair<string, List<string>>("0", []);
+                }
 
                 if (optionsDictionary.TryGetValue((int)selectedYearNumber, out var selectedYear))
                 {
-                    if (selectedYear == "Exit")
-                    {
-                        return new KeyValuePair<string, List<string>>("0", []);
-                    }
                     return new KeyValuePair<string, List<string>>(selectedYear, availableYears[selectedYear]);
                 }
             }
         }
 
-        static int SelectDay(List<string> availableDays)
+        static uint SelectDay(List<string> availableDays)
         {
+            if (availableDays == null || availableDays.Count == 0)
+            {
+                return 0;
+            }
+
             while (true)
             {
                 var optionsDictionary = new Dictionary<int, string>();
-                uint counter = 0;
+                uint counter = 1;
+                int counterPaddingOffset = (availableDays.Count - 1).ToString().Length;
                 var message = $"{NewLine}Select Day. Available options:{NewLine}";
                 foreach (var day in availableDays)
                 {
-                    counter++;
                     optionsDictionary.Add((int)counter, day);
-                    message += $"{NewLine}{counter}) {day}";
+                    message += $"{NewLine}{counter.ToString().PadLeft(counterPaddingOffset, '0')}) {day}";
+                    counter++;
                 }
 
                 message += $"{NewLine}{NewLine}Enter day selection";
-                var selectDayNumber = Output.QuestionNumberInput(message, 1, counter);
+                var selectDayNumber = Output.QuestionNumberInput(message, 1, counter - 1);
+
+                if (selectDayNumber == 1)
+                {
+                    return 0;
+                }
 
                 if (optionsDictionary.TryGetValue((int)selectDayNumber, out var selectedDay))
                 {
-                    if (selectedDay == "Exit")
-                    {
-                        return 0;
-                    }
-                    return int.Parse(selectedDay.Split(' ')[1]);
+                    return uint.Parse(selectedDay.Split(' ')[1]);
                 }
             }
         }
@@ -189,7 +212,7 @@ namespace AdventOfCode.Terminal
             }
         }
 
-        static IAdventDay GetAdventDay(string year, int day)
+        static IAdventDay GetAdventDay(string year, uint day)
         {
             var assembly = AppDomain.CurrentDomain.GetAssemblies()
                 .FirstOrDefault(a => a.GetName().Name == "AdventOfCode.Business") ?? throw new InvalidOperationException("AdventOfCode Business Assembly not found.");
@@ -202,7 +225,7 @@ namespace AdventOfCode.Terminal
                 : (IAdventDay)Activator.CreateInstance(type)!;
         }
 
-        internal static IEnumerable<string> GetAdventDayClasses()
+        internal static IEnumerable<AdventDayName> GetAdventDayClasses()
         {
             var targetNamespace = "AdventOfCode.Business.Year2025";
             var interfaceType = typeof(IAdventDay);
@@ -210,7 +233,7 @@ namespace AdventOfCode.Terminal
             // Load the referenced assembly by its simple name
             var businessAssembly = Assembly.Load("AdventOfCode.Business");
 
-            return businessAssembly
+            var fileNames = businessAssembly
                 .GetTypes()
                 .Where(t =>
                     t.IsClass &&
@@ -218,6 +241,33 @@ namespace AdventOfCode.Terminal
                     t.Namespace == targetNamespace &&
                     interfaceType.IsAssignableFrom(t))
                 .Select(type => type.Name);
+
+            return GetAdventDayNames([.. fileNames]);
         }
+
+        internal static IEnumerable<AdventDayName> GetAdventDayNames(List<string> adventDays)
+        {
+            if (adventDays == null || adventDays.Count == 0)
+            {
+                return [];
+            }
+
+            List<AdventDayName> dayNames = [];
+            var dayCount = adventDays.Count.ToString().Length;
+
+            foreach (var day in adventDays)
+            {
+                var num = day.Replace("Day", string.Empty);
+                if (!uint.TryParse(num, out var dayNumber))
+                {
+                    throw new FormatException($"Class Name in unexpected format: {day}");
+                }
+                dayNames.Add(new AdventDayName(dayNumber, $"Day {dayNumber.ToString().PadLeft(dayCount, '0')}"));
+            }
+
+            return dayNames;
+        }
+
+        internal record AdventDayName(uint Number, string ClassName);
     }
 }

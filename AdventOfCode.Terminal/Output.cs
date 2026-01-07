@@ -123,6 +123,12 @@
                     return 0;
                 }
 
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    WriteError("Invalid input. Please try again.");
+                    continue;
+                }
+
                 if (uint.TryParse(input, out uint number))
                 {
                     if (number >= min && number <= max)
